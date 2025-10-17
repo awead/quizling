@@ -1,10 +1,8 @@
-"""Tests for file reading utilities."""
-
-import tempfile
-from pathlib import Path
-
 import pytest
+import tempfile
 
+
+from pathlib import Path
 from quizling.file_reader import (
     DOCXFileReader,
     FileReaderFactory,

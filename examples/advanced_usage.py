@@ -1,26 +1,17 @@
-"""Advanced usage examples for Quizling quiz generator."""
-
 import asyncio
-import os
+
+
 from pathlib import Path
-
-from dotenv import load_dotenv
-
 from quizling import DifficultyLevel, QuizConfig, QuizGenerator
 
 
 async def generate_focused_quiz() -> None:
-    """Generate a quiz focused on a specific topic."""
-    load_dotenv()
-
     config = QuizConfig(
+        api_version="2024-12-01-preview",
         num_questions=3,
         difficulty=DifficultyLevel.HARD,
         include_explanations=True,
         topic_focus="machine learning frameworks",
-        azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT", ""),
-        azure_api_key=os.getenv("AZURE_OPENAI_API_KEY", ""),
-        azure_deployment_name=os.getenv("AZURE_OPENAI_DEPLOYMENT", "gpt-4o-mini"),
     )
 
     generator = QuizGenerator(config)
@@ -54,8 +45,6 @@ async def generate_focused_quiz() -> None:
 
 
 async def generate_multiple_difficulty_levels() -> None:
-    """Generate quizzes at different difficulty levels from the same content."""
-    load_dotenv()
 
     content = """
     Climate change refers to long-term shifts in global temperatures and weather
@@ -71,12 +60,10 @@ async def generate_multiple_difficulty_levels() -> None:
 
     for difficulty in [DifficultyLevel.EASY, DifficultyLevel.MEDIUM, DifficultyLevel.HARD]:
         config = QuizConfig(
+            api_version="2024-12-01-preview",
             num_questions=2,
             difficulty=difficulty,
             include_explanations=False,
-            azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT", ""),
-            azure_api_key=os.getenv("AZURE_OPENAI_API_KEY", ""),
-            azure_deployment_name=os.getenv("AZURE_OPENAI_DEPLOYMENT", "gpt-4o-mini"),
         )
 
         generator = QuizGenerator(config)
@@ -90,8 +77,6 @@ async def generate_multiple_difficulty_levels() -> None:
 
 
 async def batch_process_files() -> None:
-    """Process multiple files and generate quizzes for each."""
-    load_dotenv()
 
     files_to_process = [
         "document1.txt",
@@ -100,12 +85,10 @@ async def batch_process_files() -> None:
     ]
 
     config = QuizConfig(
+        api_version="2024-12-01-preview",
         num_questions=3,
         difficulty=DifficultyLevel.MEDIUM,
         include_explanations=True,
-        azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT", ""),
-        azure_api_key=os.getenv("AZURE_OPENAI_API_KEY", ""),
-        azure_deployment_name=os.getenv("AZURE_OPENAI_DEPLOYMENT", "gpt-4o-mini"),
     )
 
     generator = QuizGenerator(config)
@@ -125,11 +108,6 @@ async def batch_process_files() -> None:
             print(f"  Error: {e}")
 
     print(f"\nSuccessfully processed {len(results)} files")
-
-    for i, result in enumerate(results, 1):
-        output_file = f"quiz_batch_{i}.json"
-        generator.export_to_json(result, output_file)
-        print(f"Exported {Path(result.source_file).name} quiz to {output_file}")
 
 
 async def main() -> None:

@@ -1,6 +1,7 @@
 """Utilities for reading content from various file formats."""
 
-import os
+
+
 from pathlib import Path
 from typing import Protocol
 
@@ -14,7 +15,6 @@ class FileReader(Protocol):
 
 
 class TextFileReader:
-    """Reader for plain text files."""
 
     def read(self, file_path: Path) -> str:
         """Read content from a text file.
@@ -38,7 +38,6 @@ class TextFileReader:
 
 
 class PDFFileReader:
-    """Reader for PDF files."""
 
     def read(self, file_path: Path) -> str:
         """Read content from a PDF file.
@@ -73,7 +72,6 @@ class PDFFileReader:
 
 
 class DOCXFileReader:
-    """Reader for Microsoft Word DOCX files."""
 
     def read(self, file_path: Path) -> str:
         """Read content from a DOCX file.

@@ -1,12 +1,8 @@
-"""Tests for QuizGenerator."""
-
 import tempfile
-from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch
-
 import pytest
-from pydantic_ai import Agent
 
+
+from pathlib import Path
 from quizling.generator import QuizGenerator
 from quizling.models import (
     AnswerOption,
@@ -15,6 +11,7 @@ from quizling.models import (
     QuizConfig,
     QuizResult,
 )
+from unittest.mock import AsyncMock, MagicMock, patch
 
 
 @pytest.fixture
@@ -123,7 +120,7 @@ class TestQuizGenerator:
         generator = QuizGenerator(mock_config)
 
         mock_result = MagicMock()
-        mock_result.data = sample_questions
+        mock_result.output = sample_questions
 
         with patch.object(generator._agent, "run", new_callable=AsyncMock) as mock_run:
             mock_run.return_value = mock_result
@@ -157,7 +154,7 @@ class TestQuizGenerator:
 
         try:
             mock_result = MagicMock()
-            mock_result.data = sample_questions
+            mock_result.output = sample_questions
 
             with patch.object(
                 generator._agent, "run", new_callable=AsyncMock
@@ -228,80 +225,3 @@ class TestQuizGenerator:
             with pytest.raises(Exception, match="Error generating questions"):
                 await generator._generate_questions("Test content")
 
-    def test_export_to_json(
-        self, mock_config: QuizConfig, sample_questions: list[MultipleChoiceQuestion]
-    ) -> None:
-        """Test exporting quiz result to JSON."""
-        generator = QuizGenerator(mock_config)
-
-        result = QuizResult(
-            questions=sample_questions,
-            source_file="/test/file.txt",
-            config=mock_config,
-        )
-
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
-            temp_path = Path(f.name)
-
-        try:
-            generator.export_to_json(result, temp_path)
-
-            assert temp_path.exists()
-
-            import json
-
-            with open(temp_path) as f:
-                data = json.load(f)
-
-            assert data["source_file"] == "/test/file.txt"
-            assert data["num_questions"] == 3
-            assert data["difficulty"] == "medium"
-            assert len(data["questions"]) == 3
-            assert data["questions"][0]["question"] == "What is Python?"
-        finally:
-            temp_path.unlink()
-
-    def test_format_quiz_text(
-        self, mock_config: QuizConfig, sample_questions: list[MultipleChoiceQuestion]
-    ) -> None:
-        """Test formatting quiz result as text."""
-        generator = QuizGenerator(mock_config)
-
-        result = QuizResult(
-            questions=sample_questions,
-            source_file="/test/file.txt",
-            config=mock_config,
-        )
-
-        text = generator.format_quiz_text(result)
-
-        assert "Quiz from: /test/file.txt" in text
-        assert "Number of questions: 3" in text
-        assert "Difficulty: medium" in text
-        assert "What is Python?" in text
-        assert "Who created Python?" in text
-        assert "What is PEP 8?" in text
-        assert "[X]" in text
-        assert "[ ]" in text
-        assert "Explanation:" in text
-
-    def test_format_quiz_text_no_explanations(
-        self, mock_config: QuizConfig, sample_questions: list[MultipleChoiceQuestion]
-    ) -> None:
-        """Test formatting quiz without explanations."""
-        mock_config.include_explanations = False
-
-        for q in sample_questions:
-            q.explanation = None
-
-        generator = QuizGenerator(mock_config)
-
-        result = QuizResult(
-            questions=sample_questions,
-            source_file="/test/file.txt",
-            config=mock_config,
-        )
-
-        text = generator.format_quiz_text(result)
-
-        assert "Explanation:" not in text

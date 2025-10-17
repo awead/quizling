@@ -1,35 +1,16 @@
-"""Basic usage example for Quizling quiz generator."""
-
 import asyncio
-import os
+
+
 from pathlib import Path
-
-from dotenv import load_dotenv
-
 from quizling import DifficultyLevel, QuizConfig, QuizGenerator
 
 
 async def main() -> None:
-    """Demonstrate basic usage of QuizGenerator."""
-    load_dotenv()
-
-    azure_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
-    azure_api_key = os.getenv("AZURE_OPENAI_API_KEY")
-    azure_deployment = os.getenv("AZURE_OPENAI_DEPLOYMENT", "gpt-4o-mini")
-
-    if not azure_endpoint or not azure_api_key:
-        raise ValueError(
-            "Please set AZURE_OPENAI_ENDPOINT and AZURE_OPENAI_API_KEY "
-            "environment variables"
-        )
-
     config = QuizConfig(
+        api_version="2024-12-01-preview",
         num_questions=5,
         difficulty=DifficultyLevel.MEDIUM,
         include_explanations=True,
-        azure_endpoint=azure_endpoint,
-        azure_api_key=azure_api_key,
-        azure_deployment_name=azure_deployment,
     )
 
     generator = QuizGenerator(config)
@@ -80,16 +61,6 @@ async def main() -> None:
             print(f"\nExplanation: {question.explanation}")
 
         print("\n" + "-" * 80)
-
-    output_json = "quiz_output.json"
-    generator.export_to_json(result, output_json)
-    print(f"\nQuiz exported to {output_json}")
-
-    output_txt = "quiz_output.txt"
-    with open(output_txt, "w") as f:
-        f.write(generator.format_quiz_text(result))
-    print(f"Quiz formatted text saved to {output_txt}")
-
 
 if __name__ == "__main__":
     asyncio.run(main())

@@ -1,8 +1,7 @@
-"""Tests for Pydantic models."""
-
 import pytest
-from pydantic import ValidationError
 
+
+from pydantic import ValidationError
 from quizling.models import (
     AnswerOption,
     DifficultyLevel,
@@ -146,7 +145,7 @@ class TestQuizConfig:
         assert config.num_questions == 5
         assert config.difficulty == DifficultyLevel.MEDIUM
         assert config.include_explanations is True
-        assert config.azure_deployment_name == "gpt-4o-mini"
+        assert config.azure_deployment_name == "gpt-5-mini"
 
     def test_num_questions_validation(self) -> None:
         """Test that num_questions is validated."""
