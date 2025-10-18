@@ -1,8 +1,4 @@
-"""Command-line interface for Quizling.
-
-Status: WIP
-TODO: Needs an output strategy with storage and re-use in mind.
-"""
+"""Command-line interface for Quizling."""
 
 import argparse
 import asyncio
@@ -11,14 +7,10 @@ import sys
 
 from pathlib import Path
 from quizling import DifficultyLevel, QuizConfig, QuizGenerator
+from quizling.quiz_writer import QuizWriter
 
 
 def parse_args() -> argparse.Namespace:
-    """Parse command line arguments.
-
-    Returns:
-        Parsed command line arguments
-    """
     parser = argparse.ArgumentParser(
         description="Generate multiple choice questions from documents using Azure OpenAI"
     )
@@ -59,15 +51,16 @@ def parse_args() -> argparse.Namespace:
         "-o",
         "--output",
         type=str,
-        help="Output file path (default: quiz_output.json)",
+        default="out",
+        help="Directory to output questions (default: out)",
     )
 
     parser.add_argument(
-        "--format",
+        "-a",
+        "--api-version",
         type=str,
-        choices=["json", "text", "both"],
-        default="both",
-        help="Output format (default: both)",
+        default="2024-12-01-preview",
+        help="OpenAI api version (default: 2024-12-01-preview)",
     )
 
     return parser.parse_args()
@@ -88,10 +81,12 @@ async def main() -> None:
     }
 
     config = QuizConfig(
+        api_version=args.api_version,
         num_questions=args.num_questions,
         difficulty=difficulty_map[args.difficulty],
         include_explanations=not args.no_explanations,
         topic_focus=args.topic,
+        output_directory=args.output,
     )
 
     print(f"Processing: {file_path}")
@@ -99,7 +94,15 @@ async def main() -> None:
 
     try:
         generator = QuizGenerator(config)
-        await generator.generate_from_file(file_path)
+        quiz_result = await generator.generate_from_file(file_path)
+
+        print(f"Writing questions to: {config.output_directory}")
+        writer = QuizWriter(quiz_result)
+        written_files = writer.write()
+
+        print(f"Successfully wrote {len(written_files)} questions")
+        for file_path in written_files:
+            print(f"  - {file_path}")
 
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
