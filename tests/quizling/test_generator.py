@@ -125,7 +125,10 @@ class TestQuizGenerator:
         with patch.object(generator._agent, "run", new_callable=AsyncMock) as mock_run:
             mock_run.return_value = mock_result
 
-            text = "This is a test content that is long enough to generate questions from. " * 5
+            text = (
+                "This is a test content that is long enough to generate questions from. "
+                * 5
+            )
             result = await generator.generate_from_text(text)
 
             assert isinstance(result, QuizResult)
@@ -224,4 +227,3 @@ class TestQuizGenerator:
 
             with pytest.raises(Exception, match="Error generating questions"):
                 await generator._generate_questions("Test content")
-

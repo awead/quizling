@@ -13,14 +13,11 @@ from textwrap import dedent
 
 
 class QuizGenerator:
-
     def __init__(self, config: QuizConfig):
-
         self.config = config
         self._agent = self._create_agent()
 
     def _create_agent(self) -> Agent[None, list[MultipleChoiceQuestion]]:
-
         client = AsyncAzureOpenAI(
             api_key=self.config.azure_api_key,
             api_version=self.config.api_version,
@@ -41,7 +38,6 @@ class QuizGenerator:
         )
 
     def _build_system_prompt(self) -> str:
-
         explanation_instruction = (
             "Include a detailed explanation for each correct answer."
             if self.config.include_explanations
@@ -78,7 +74,6 @@ class QuizGenerator:
         """)
 
     def _build_agent_prompt(self, content: str) -> str:
-
         return dedent(f"""
             Based on the following content, generate {self.config.num_questions}
             multiple choice questions at {self.config.difficulty.value} difficulty level.
@@ -109,7 +104,6 @@ class QuizGenerator:
         )
 
     async def generate_from_text(self, text: str) -> QuizResult:
-
         if len(text.strip()) < 100:
             raise ValueError(
                 f"Text content is too short to generate questions. "
@@ -132,4 +126,3 @@ class QuizGenerator:
             return result.output
         except Exception as e:
             raise Exception(f"Error generating questions: {str(e)}") from e
-

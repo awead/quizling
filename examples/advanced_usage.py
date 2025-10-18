@@ -45,7 +45,6 @@ async def generate_focused_quiz() -> None:
 
 
 async def generate_multiple_difficulty_levels() -> None:
-
     content = """
     Climate change refers to long-term shifts in global temperatures and weather
     patterns. While climate change is a natural phenomenon, scientific evidence
@@ -58,7 +57,11 @@ async def generate_multiple_difficulty_levels() -> None:
     these gases, intensifying the greenhouse effect and causing global warming.
     """
 
-    for difficulty in [DifficultyLevel.EASY, DifficultyLevel.MEDIUM, DifficultyLevel.HARD]:
+    for difficulty in [
+        DifficultyLevel.EASY,
+        DifficultyLevel.MEDIUM,
+        DifficultyLevel.HARD,
+    ]:
         config = QuizConfig(
             api_version="2024-12-01-preview",
             num_questions=2,
@@ -77,7 +80,6 @@ async def generate_multiple_difficulty_levels() -> None:
 
 
 async def batch_process_files() -> None:
-
     files_to_process = [
         "document1.txt",
         "document2.pdf",
