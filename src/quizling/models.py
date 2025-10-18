@@ -84,6 +84,11 @@ class QuizConfig(BaseModel):
         description="Optional specific topic to focus on within the content",
     )
 
+    output_directory: str = Field(
+        default="out",
+        description="Directory where quiz JSON files will be written",
+    )
+
     azure_endpoint: str = Field(
         default=os.getenv("AZURE_OPENAI_ENDPOINT"),
         description="Azure OpenAI endpoint URL",

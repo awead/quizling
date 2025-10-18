@@ -125,6 +125,7 @@ class TestQuizConfig:
             num_questions=5,
             difficulty=DifficultyLevel.MEDIUM,
             include_explanations=True,
+            output_directory="custom_output",
             azure_endpoint="https://example.openai.azure.com",
             azure_api_key="test-key",
             azure_deployment_name="gpt-4o-mini",
@@ -133,6 +134,7 @@ class TestQuizConfig:
         assert config.num_questions == 5
         assert config.difficulty == DifficultyLevel.MEDIUM
         assert config.include_explanations is True
+        assert config.output_directory == "custom_output"
         assert config.azure_endpoint == "https://example.openai.azure.com"
 
     def test_default_values(self) -> None:
@@ -146,6 +148,7 @@ class TestQuizConfig:
         assert config.difficulty == DifficultyLevel.MEDIUM
         assert config.include_explanations is True
         assert config.azure_deployment_name == "gpt-5-mini"
+        assert config.output_directory == "out"
 
     def test_num_questions_validation(self) -> None:
         """Test that num_questions is validated."""
