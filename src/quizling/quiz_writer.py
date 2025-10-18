@@ -11,15 +11,12 @@ class QuizWriterError(Exception):
 
 
 class QuizWriter:
-    def __init__(self, quiz_result: QuizResult, output_path: str | Path) -> None:
+    def __init__(self, quiz_result: QuizResult) -> None:
         if quiz_result is None:
             raise ValueError("quiz_result cannot be None")
 
-        if not output_path:
-            raise ValueError("output_path cannot be empty")
-
         self.quiz_result: QuizResult = quiz_result
-        self.output_path: Path = Path(output_path)
+        self.output_path: Path = Path(quiz_result.config.output_directory)
 
     def write(self) -> list[Path]:
         if not self.quiz_result.questions:

@@ -87,7 +87,8 @@ class TestQuizWriter:
     def test_write_creates_correct_number_of_files(
         self, quiz_result: QuizResult, temp_dir: Path
     ) -> None:
-        writer = QuizWriter(quiz_result, temp_dir)
+        quiz_result.config.output_directory = str(temp_dir)
+        writer = QuizWriter(quiz_result)
         written_files = writer.write()
 
         assert len(written_files) == len(quiz_result.questions)
@@ -96,7 +97,8 @@ class TestQuizWriter:
     def test_write_creates_valid_json_files(
         self, quiz_result: QuizResult, temp_dir: Path
     ) -> None:
-        writer = QuizWriter(quiz_result, temp_dir)
+        quiz_result.config.output_directory = str(temp_dir)
+        writer = QuizWriter(quiz_result)
         written_files = writer.write()
 
         for file_path in written_files:
@@ -113,7 +115,8 @@ class TestQuizWriter:
     def test_write_preserves_question_data(
         self, quiz_result: QuizResult, temp_dir: Path
     ) -> None:
-        writer = QuizWriter(quiz_result, temp_dir)
+        quiz_result.config.output_directory = str(temp_dir)
+        writer = QuizWriter(quiz_result)
         written_files = writer.write()
 
         written_questions = []
@@ -131,7 +134,8 @@ class TestQuizWriter:
     def test_write_uses_uuid_filenames(
         self, quiz_result: QuizResult, temp_dir: Path
     ) -> None:
-        writer = QuizWriter(quiz_result, temp_dir)
+        quiz_result.config.output_directory = str(temp_dir)
+        writer = QuizWriter(quiz_result)
         written_files = writer.write()
 
         for file_path in written_files:
@@ -150,7 +154,8 @@ class TestQuizWriter:
         non_existent_dir = temp_dir / "new_directory" / "nested"
         assert not non_existent_dir.exists()
 
-        writer = QuizWriter(quiz_result, non_existent_dir)
+        quiz_result.config.output_directory = str(non_existent_dir)
+        writer = QuizWriter(quiz_result)
         written_files = writer.write()
 
         assert non_existent_dir.exists()
@@ -163,7 +168,8 @@ class TestQuizWriter:
         empty_quiz = QuizResult(
             questions=[], source_file="test_empty.txt", config=quiz_config
         )
-        writer = QuizWriter(empty_quiz, temp_dir)
+        empty_quiz.config.output_directory = str(temp_dir)
+        writer = QuizWriter(empty_quiz)
         written_files = writer.write()
 
         assert written_files == []
@@ -172,7 +178,8 @@ class TestQuizWriter:
     def test_write_with_string_path(
         self, quiz_result: QuizResult, temp_dir: Path
     ) -> None:
-        writer = QuizWriter(quiz_result, str(temp_dir))
+        quiz_result.config.output_directory = str(temp_dir)
+        writer = QuizWriter(quiz_result)
         written_files = writer.write()
 
         assert len(written_files) == len(quiz_result.questions)
@@ -199,7 +206,8 @@ class TestQuizWriter:
             source_file="test_utf8.txt",
             config=quiz_config,
         )
-        writer = QuizWriter(quiz, temp_dir)
+        quiz.config.output_directory = str(temp_dir)
+        writer = QuizWriter(quiz)
         written_files = writer.write()
 
         with open(written_files[0], encoding="utf-8") as f:
@@ -210,32 +218,31 @@ class TestQuizWriter:
     def test_write_returns_path_objects(
         self, quiz_result: QuizResult, temp_dir: Path
     ) -> None:
-        writer = QuizWriter(quiz_result, temp_dir)
+        quiz_result.config.output_directory = str(temp_dir)
+        writer = QuizWriter(quiz_result)
         written_files = writer.write()
 
         assert all(isinstance(f, Path) for f in written_files)
 
     def test_init_with_none_quiz_result(self, temp_dir: Path) -> None:
         with pytest.raises(ValueError, match="quiz_result cannot be None"):
-            QuizWriter(None, temp_dir)  # type: ignore
-
-    def test_init_with_empty_output_path(self, quiz_result: QuizResult) -> None:
-        with pytest.raises(ValueError, match="output_path cannot be empty"):
-            QuizWriter(quiz_result, "")
+            QuizWriter(None)  # type: ignore
 
     def test_write_handles_directory_creation_failure(
         self, quiz_result: QuizResult
     ) -> None:
         invalid_path = Path("/dev/null/cannot_create_here")
 
-        writer = QuizWriter(quiz_result, invalid_path)
+        quiz_result.config.output_directory = str(invalid_path)
+        writer = QuizWriter(quiz_result)
         with pytest.raises(QuizWriterError, match="Failed to create output directory"):
             writer.write()
 
     def test_multiple_writes_create_different_files(
         self, quiz_result: QuizResult, temp_dir: Path
     ) -> None:
-        writer = QuizWriter(quiz_result, temp_dir)
+        quiz_result.config.output_directory = str(temp_dir)
+        writer = QuizWriter(quiz_result)
 
         first_write = writer.write()
         second_write = writer.write()
@@ -245,7 +252,8 @@ class TestQuizWriter:
         assert len(unique_files) == len(all_files)
 
     def test_json_formatting(self, quiz_result: QuizResult, temp_dir: Path) -> None:
-        writer = QuizWriter(quiz_result, temp_dir)
+        quiz_result.config.output_directory = str(temp_dir)
+        writer = QuizWriter(quiz_result)
         written_files = writer.write()
 
         with open(written_files[0], encoding="utf-8") as f:
