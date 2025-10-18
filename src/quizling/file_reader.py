@@ -11,7 +11,6 @@ class FileReader(Protocol):
 
 
 class TextFileReader:
-
     def read(self, file_path: Path) -> str:
         """Read content from a text file.
 
@@ -34,7 +33,6 @@ class TextFileReader:
 
 
 class PDFFileReader:
-
     def read(self, file_path: Path) -> str:
         """Read content from a PDF file.
 
@@ -68,7 +66,6 @@ class PDFFileReader:
 
 
 class DOCXFileReader:
-
     def read(self, file_path: Path) -> str:
         """Read content from a DOCX file.
 

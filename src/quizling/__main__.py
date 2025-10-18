@@ -23,9 +23,7 @@ def parse_args() -> argparse.Namespace:
         description="Generate multiple choice questions from documents using Azure OpenAI"
     )
 
-    parser.add_argument(
-        "file", type=str, help="Path to the document file to process"
-    )
+    parser.add_argument("file", type=str, help="Path to the document file to process")
 
     parser.add_argument(
         "-n",
