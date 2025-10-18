@@ -1,7 +1,3 @@
-"""Utilities for reading content from various file formats."""
-
-
-
 from pathlib import Path
 from typing import Protocol
 

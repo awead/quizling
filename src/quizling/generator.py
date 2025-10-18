@@ -1,5 +1,3 @@
-
-
 from openai import AsyncAzureOpenAI
 from pathlib import Path
 from pydantic_ai import Agent
