@@ -1,9 +1,8 @@
 import os
-
-
 from enum import Enum
-from pydantic import BaseModel, Field, field_validator
 from typing import ClassVar, Literal
+
+from pydantic import BaseModel, Field, field_validator
 
 
 class DifficultyLevel(str, Enum):

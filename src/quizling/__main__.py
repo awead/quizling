@@ -3,9 +3,8 @@
 import argparse
 import asyncio
 import sys
-
-
 from pathlib import Path
+
 from quizling import DifficultyLevel, QuizConfig, QuizGenerator
 from quizling.quiz_writer import QuizWriter
 
