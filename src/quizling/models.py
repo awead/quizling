@@ -3,7 +3,7 @@ import os
 
 from enum import Enum
 from pydantic import BaseModel, Field, field_validator
-from typing import Literal
+from typing import ClassVar, Literal
 
 
 class DifficultyLevel(str, Enum):
@@ -21,6 +21,8 @@ class AnswerOption(BaseModel):
 
 
 class MultipleChoiceQuestion(BaseModel):
+    VALID_LABELS: ClassVar[frozenset[str]] = frozenset(["A", "B", "C", "D"])
+
     question: str = Field(description="The question text", min_length=1)
 
     options: list[AnswerOption] = Field(
@@ -44,10 +46,9 @@ class MultipleChoiceQuestion(BaseModel):
     @field_validator("options")
     @classmethod
     def validate_options_labels(cls, options: list[AnswerOption]) -> list[AnswerOption]:
-        expected_labels = {"A", "B", "C", "D"}
         actual_labels = {option.label for option in options}
 
-        if actual_labels != expected_labels:
+        if actual_labels != cls.VALID_LABELS:
             raise ValueError(
                 f"Options must have labels A, B, C, D. Got: {actual_labels}"
             )
@@ -58,7 +59,7 @@ class MultipleChoiceQuestion(BaseModel):
     @field_validator("correct_answer")
     @classmethod
     def validate_correct_answer(cls, correct_answer: str) -> str:
-        if correct_answer not in {"A", "B", "C", "D"}:
+        if correct_answer not in cls.VALID_LABELS:
             raise ValueError(
                 f"Correct answer must be A, B, C, or D. Got: {correct_answer}"
             )
@@ -90,21 +91,21 @@ class QuizConfig(BaseModel):
     )
 
     azure_endpoint: str = Field(
-        default=os.getenv("AZURE_OPENAI_ENDPOINT"),
+        default=os.environ["AZURE_OPENAI_ENDPOINT"],
         description="Azure OpenAI endpoint URL",
     )
 
     azure_api_key: str = Field(
-        default=os.getenv("AZURE_OPENAI_KEY"), description="Azure OpenAI API key"
+        default=os.environ["AZURE_OPENAI_KEY"], description="Azure OpenAI API key"
     )
 
     azure_deployment_name: str = Field(
-        default=os.getenv("AZURE_OPENAI_DEPLOYMENT"),
+        default=os.environ["AZURE_OPENAI_DEPLOYMENT"],
         description="Azure OpenAI deployment name",
     )
 
     api_version: str = Field(
-        default=os.getenv("AZURE_OPENAI_VERSION"),
+        default=os.environ["AZURE_OPENAI_VERSION"],
         description="Azure OpenAI API version",
     )
 

@@ -3,7 +3,7 @@ import uuid
 
 
 from pathlib import Path
-from quizling.models import QuizResult
+from quizling.models import MultipleChoiceQuestion, QuizResult
 
 
 class QuizWriterError(Exception):
@@ -42,7 +42,7 @@ class QuizWriter:
 
         return written_files
 
-    def _write_question(self, question) -> Path:
+    def _write_question(self, question: MultipleChoiceQuestion) -> Path:
         filename = f"{uuid.uuid4()}.json"
         file_path = self.output_path / filename
 

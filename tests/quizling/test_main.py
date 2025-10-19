@@ -1,6 +1,4 @@
-import argparse
 import pytest
-import sys
 import tempfile
 
 from io import StringIO
@@ -142,9 +140,7 @@ class TestMain:
             ),
         ]
 
-        return QuizResult(
-            questions=questions, source_file="test.txt", config=config
-        )
+        return QuizResult(questions=questions, source_file="test.txt", config=config)
 
     @pytest.mark.asyncio
     async def test_main_success(self, sample_quiz_result: QuizResult) -> None:
@@ -157,9 +153,7 @@ class TestMain:
             # Update the quiz result's config to use the correct output directory
             sample_quiz_result.config.output_directory = str(output_dir)
 
-            with patch(
-                "sys.argv", ["quizling", str(test_file), "-o", str(output_dir)]
-            ):
+            with patch("sys.argv", ["quizling", str(test_file), "-o", str(output_dir)]):
                 mock_generator = MagicMock()
                 mock_generator.generate_from_file = AsyncMock(
                     return_value=sample_quiz_result
@@ -284,9 +278,7 @@ class TestMain:
             # Update the quiz result's config to use the correct output directory
             sample_quiz_result.config.output_directory = str(output_dir)
 
-            with patch(
-                "sys.argv", ["quizling", str(test_file), "-o", str(output_dir)]
-            ):
+            with patch("sys.argv", ["quizling", str(test_file), "-o", str(output_dir)]):
                 mock_generator = MagicMock()
                 mock_generator.generate_from_file = AsyncMock(
                     return_value=sample_quiz_result
@@ -325,7 +317,14 @@ class TestMain:
             ]:
                 with patch(
                     "sys.argv",
-                    ["quizling", str(test_file), "-d", difficulty_str, "-o", str(output_dir)],
+                    [
+                        "quizling",
+                        str(test_file),
+                        "-d",
+                        difficulty_str,
+                        "-o",
+                        str(output_dir),
+                    ],
                 ):
                     mock_generator = MagicMock()
                     mock_generator.generate_from_file = AsyncMock(

@@ -13,6 +13,10 @@ from textwrap import dedent
 
 
 class QuizGenerator:
+    MIN_CONTENT_LENGTH = (
+        100  # Minimum characters needed for meaningful question generation
+    )
+
     def __init__(self, config: QuizConfig):
         self.config = config
         self._agent = self._create_agent()
@@ -84,16 +88,20 @@ class QuizGenerator:
             Generate the questions following the specified format and requirements.
         """)
 
+    def _validate_content_length(self, content: str) -> None:
+        stripped_content = content.strip()
+        if len(stripped_content) < self.MIN_CONTENT_LENGTH:
+            raise ValueError(
+                f"Content is too short to generate questions. "
+                f"Minimum {self.MIN_CONTENT_LENGTH} characters required, "
+                f"got {len(stripped_content)}"
+            )
+
     async def generate_from_file(self, file_path: str | Path) -> QuizResult:
         path = Path(file_path)
 
         content = FileReaderFactory.read_file(path)
-
-        if len(content.strip()) < 100:
-            raise ValueError(
-                f"File content is too short to generate questions. "
-                f"Minimum 100 characters required, got {len(content)}"
-            )
+        self._validate_content_length(content)
 
         questions = await self._generate_questions(content)
 
@@ -104,11 +112,7 @@ class QuizGenerator:
         )
 
     async def generate_from_text(self, text: str) -> QuizResult:
-        if len(text.strip()) < 100:
-            raise ValueError(
-                f"Text content is too short to generate questions. "
-                f"Minimum 100 characters required, got {len(text)}"
-            )
+        self._validate_content_length(text)
 
         questions = await self._generate_questions(text)
 
