@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 
+from quizling.api.error_handlers import register_error_handlers
 from quizling.api.router import router
 
 app = FastAPI(
@@ -10,6 +11,7 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
+register_error_handlers(app)
 app.include_router(router)
 
 

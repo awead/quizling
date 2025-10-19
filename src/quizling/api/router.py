@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, Query
 
 from quizling.api.models import ErrorResponse, PaginatedResponse, QuestionResponse
 from quizling.api.services import QuestionQueryParams, QuestionService
@@ -51,23 +51,20 @@ async def get_questions(
     - **cursor**: Pagination cursor (number of items to skip)
     - **limit**: Maximum number of results (1-100, default 20)
     """
-    try:
-        params = QuestionQueryParams(
-            difficulty=difficulty,
-            search=search,
-            cursor=cursor or 0,
-            limit=limit,
-        )
-        result = service.get_questions(params)
+    params = QuestionQueryParams(
+        difficulty=difficulty,
+        search=search,
+        cursor=cursor or 0,
+        limit=limit,
+    )
+    result = service.get_questions(params)
 
-        return PaginatedResponse(
-            data=result.questions,
-            next_cursor=result.next_cursor,
-            has_more=result.has_more,
-            total=result.total,
-        )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+    return PaginatedResponse(
+        data=result.questions,
+        next_cursor=result.next_cursor,
+        has_more=result.has_more,
+        total=result.total,
+    )
 
 
 @router.get(
@@ -86,12 +83,5 @@ async def get_question(
 
     - **question_id**: MongoDB ObjectId of the question
     """
-    try:
-        question = service.get_question_by_id(question_id)
-        if question is None:
-            raise HTTPException(status_code=404, detail="Question not found")
-        return QuestionResponse(data=question)
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+    question = service.get_question_by_id(question_id)
+    return QuestionResponse(data=question)

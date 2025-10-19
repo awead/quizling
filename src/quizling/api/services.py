@@ -1,3 +1,10 @@
+from bson.errors import InvalidId
+
+from quizling.api.exceptions import (
+    DatabaseError,
+    InvalidObjectIdError,
+    ResourceNotFoundError,
+)
 from quizling.base.models import MultipleChoiceQuestion
 from quizling.storage.db import MongoDBClient
 
@@ -45,16 +52,23 @@ class QuestionService:
         self._db = db
 
     def get_questions(self, params: QuestionQueryParams) -> PaginationResult:
-        fetch_limit = params.limit + 1
-        questions = self._fetch_filtered_questions(params, fetch_limit)
-        total_results = self._calculate_total(params, questions)
+        try:
+            fetch_limit = params.limit + 1
+            questions = self._fetch_filtered_questions(params, fetch_limit)
+            total_results = self._calculate_total(params, questions)
 
-        return PaginationResult(
-            questions=questions,
-            cursor=params.cursor,
-            limit=params.limit,
-            total_results=total_results,
-        )
+            return PaginationResult(
+                questions=questions,
+                cursor=params.cursor,
+                limit=params.limit,
+                total_results=total_results,
+            )
+        except (DatabaseError, ResourceNotFoundError, InvalidObjectIdError):
+            raise  # re-raises with our custom exceptions
+        except Exception as e:
+            raise DatabaseError(
+                f"Failed to retrieve questions: {str(e)}", operation="get_questions"
+            )
 
     def _fetch_filtered_questions(
         self, params: QuestionQueryParams, fetch_limit: int
@@ -98,5 +112,17 @@ class QuestionService:
         else:
             return self._db.count_questions()
 
-    def get_question_by_id(self, question_id: str) -> MultipleChoiceQuestion | None:
-        return self._db.get_question(question_id)
+    def get_question_by_id(self, question_id: str) -> MultipleChoiceQuestion:
+        try:
+            question = self._db.get_question(question_id)
+            if question is None:
+                raise ResourceNotFoundError("Question", question_id)
+            return question
+        except InvalidId:
+            raise InvalidObjectIdError(question_id)
+        except (ResourceNotFoundError, InvalidObjectIdError):
+            raise  # re-raises with our custom exceptions
+        except Exception as e:
+            raise DatabaseError(
+                f"Failed to retrieve question: {str(e)}", operation="get_question"
+            )

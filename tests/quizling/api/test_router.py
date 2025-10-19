@@ -202,7 +202,9 @@ class TestGetQuestions:
 
         response = client.get("/questions")
         assert response.status_code == 500
-        assert "Database error" in response.json()["detail"]
+        json_response = response.json()
+        assert "Failed to retrieve questions" in json_response["detail"]
+        assert json_response.get("operation") == "get_questions"
 
 
 class TestGetQuestionById:
@@ -241,7 +243,9 @@ class TestGetQuestionById:
 
         response = client.get("/questions/invalid-id")
         assert response.status_code == 500
-        assert "Database error" in response.json()["detail"]
+        json_response = response.json()
+        assert "Failed to retrieve question" in json_response["detail"]
+        assert json_response.get("operation") == "get_question"
 
 
 class TestOpenAPISchema:
