@@ -3,7 +3,7 @@ import uuid
 
 
 from pathlib import Path
-from quizling.models import MultipleChoiceQuestion, QuizResult
+from quizling.base.models import MultipleChoiceQuestion, QuizResult
 
 
 class QuizWriterError(Exception):

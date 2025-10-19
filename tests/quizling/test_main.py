@@ -6,7 +6,7 @@ from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
 from quizling.__main__ import main, parse_args
-from quizling.models import (
+from quizling.base.models import (
     AnswerOption,
     DifficultyLevel,
     MultipleChoiceQuestion,

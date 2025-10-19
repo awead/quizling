@@ -2,7 +2,7 @@ import asyncio
 
 
 from pathlib import Path
-from quizling import DifficultyLevel, QuizConfig, QuizGenerator
+from quizling.base import DifficultyLevel, QuizConfig, QuizGenerator
 
 
 async def main() -> None:

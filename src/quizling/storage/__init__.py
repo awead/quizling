@@ -1,4 +1,7 @@
-"""MongoDB storage for quiz questions."""
+"""quizling.storage
+
+Loads questions into MongoDB. Includes methods for search and retrieval.
+"""
 
 from quizling.storage.db import MongoDBClient
 from quizling.storage.loader import (

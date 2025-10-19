@@ -1,8 +1,8 @@
 import json
 
 
-from quizling.generator import QuizGenerator
-from quizling.models import QuizConfig
+from quizling.base.generator import QuizGenerator
+from quizling.base.models import QuizConfig
 
 
 async def main():

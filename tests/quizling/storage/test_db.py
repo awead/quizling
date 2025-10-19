@@ -3,7 +3,7 @@
 import pytest
 from unittest.mock import MagicMock, patch
 
-from quizling.models import AnswerOption, DifficultyLevel, MultipleChoiceQuestion
+from quizling.base.models import AnswerOption, DifficultyLevel, MultipleChoiceQuestion
 from quizling.storage import MongoDBClient
 from quizling.storage.db import MongoDBConnectionError
 

@@ -4,7 +4,7 @@ from pymongo import MongoClient, errors
 from pymongo.collection import Collection
 from pymongo.database import Database
 
-from quizling.models import MultipleChoiceQuestion
+from quizling.base.models import MultipleChoiceQuestion
 
 
 class MongoDBConnectionError(Exception):

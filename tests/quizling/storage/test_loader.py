@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from quizling.models import AnswerOption, DifficultyLevel, MultipleChoiceQuestion
+from quizling.base.models import AnswerOption, DifficultyLevel, MultipleChoiceQuestion
 from quizling.storage.loader import (
     load_question_from_file,
     load_questions_from_directory,

@@ -2,7 +2,7 @@ import json
 import sys
 from pathlib import Path
 
-from quizling.models import MultipleChoiceQuestion
+from quizling.base.models import MultipleChoiceQuestion
 
 
 def load_question_from_file(file_path: Path) -> MultipleChoiceQuestion | None:
