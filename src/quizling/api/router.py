@@ -3,6 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from quizling.api.models import ErrorResponse, PaginatedResponse, QuestionResponse
+from quizling.api.services import QuestionQueryParams, QuestionService
 from quizling.storage.db import MongoDBClient
 
 router = APIRouter(prefix="/questions", tags=["questions"])
@@ -16,6 +17,12 @@ def get_db() -> MongoDBClient:
         db.close()
 
 
+def get_question_service(
+    db: Annotated[MongoDBClient, Depends(get_db)],
+) -> QuestionService:
+    return QuestionService(db)
+
+
 @router.get(
     "",
     response_model=PaginatedResponse,
@@ -24,7 +31,7 @@ def get_db() -> MongoDBClient:
     description="Retrieve questions with optional filtering by difficulty or search text. Supports cursor-based pagination.",
 )
 async def get_questions(
-    db: Annotated[MongoDBClient, Depends(get_db)],
+    service: Annotated[QuestionService, Depends(get_question_service)],
     difficulty: Annotated[
         str | None, Query(description="Filter by difficulty level (easy, medium, hard)")
     ] = None,
@@ -45,37 +52,19 @@ async def get_questions(
     - **limit**: Maximum number of results (1-100, default 20)
     """
     try:
-        skip = cursor or 0
-
-        if difficulty and search:
-            questions = db.search_questions(search)
-            questions = [q for q in questions if q.difficulty.value == difficulty]
-        elif difficulty:
-            questions = db.get_questions_by_difficulty(difficulty)
-        elif search:
-            questions = db.search_questions(search)
-        else:
-            questions = db.get_all_questions(limit=limit + 1, skip=skip)
-
-        if difficulty or search:
-            total_results = len(questions)
-            questions = questions[skip : skip + limit + 1]
-        else:
-            total_results = db.count_questions()
-
-        has_more = len(questions) > limit
-        if has_more:
-            questions = questions[:limit]
-
-        next_cursor = None
-        if has_more:
-            next_cursor = str(skip + limit)
+        params = QuestionQueryParams(
+            difficulty=difficulty,
+            search=search,
+            cursor=cursor or 0,
+            limit=limit,
+        )
+        result = service.get_questions(params)
 
         return PaginatedResponse(
-            data=questions,
-            next_cursor=next_cursor,
-            has_more=has_more,
-            total=total_results,
+            data=result.questions,
+            next_cursor=result.next_cursor,
+            has_more=result.has_more,
+            total=result.total,
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
@@ -90,7 +79,7 @@ async def get_questions(
 )
 async def get_question(
     question_id: str,
-    db: Annotated[MongoDBClient, Depends(get_db)],
+    service: Annotated[QuestionService, Depends(get_question_service)],
 ) -> QuestionResponse:
     """
     Get a specific question by ID.
@@ -98,7 +87,7 @@ async def get_question(
     - **question_id**: MongoDB ObjectId of the question
     """
     try:
-        question = db.get_question(question_id)
+        question = service.get_question_by_id(question_id)
         if question is None:
             raise HTTPException(status_code=404, detail="Question not found")
         return QuestionResponse(data=question)

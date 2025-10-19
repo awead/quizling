@@ -31,3 +31,52 @@
 
   16. Extract prompt building to separate class
   17. Use dependency injection for agent creation
+
+
+
+### API
+
+  1. Service Layer Pattern (High Priority)
+
+  - Extract business logic from routes into a dedicated QuestionService class
+  - Introduce value objects like QuestionQueryParams and PaginationResult
+  - Benefits: Better separation of concerns, easier testing, reusable logic
+
+  2. Custom Exception Handling (High Priority)
+
+  - Create domain-specific exceptions (DatabaseError, ResourceNotFoundError, etc.)
+  - Add global error handlers for consistent error responses
+  - Benefits: Better error messages, improved debugging, cleaner code
+
+  3. Protocol-Based Dependency Injection (High Priority)
+
+  - Define QuestionRepository protocol to decouple from MongoDB
+  - Use proper DI patterns with get_repository() dependency
+  - Benefits: Easier testing with mocks, swappable implementations
+
+  4. Performance Optimizations (High Priority)
+
+  - Combine search + difficulty filtering at database level instead of in Python
+  - Add connection pooling configuration for MongoDB
+  - Benefits: Significant performance improvement for filtered queries
+
+  5. Code Quality Improvements (Medium Priority)
+
+  - Eliminate duplicate document-to-model conversion code
+  - Add proper type hints and validation
+  - Add request logging and CORS support
+  - Benefits: Better maintainability, production-readiness
+
+  6. Testing Enhancements (Medium Priority)
+
+  - Move fixtures to conftest.py for reusability
+  - Add integration tests with real database
+  - Benefits: Better test organization, more comprehensive coverage
+
+  The analysis provides detailed code examples for each recommendation. Would you like me to implement any of these refactorings? The highest
+  impact changes would be:
+
+  1. Adding the service layer
+  2. Implementing custom exceptions
+  3. Optimizing the search+difficulty query
+
