@@ -20,3 +20,7 @@ syllabus.md
 .coverage
 out
 test_out
+
+# MongoDB data
+mongodb_data/
+mongodb_config/

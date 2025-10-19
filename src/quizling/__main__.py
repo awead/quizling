@@ -5,8 +5,8 @@ import asyncio
 import sys
 from pathlib import Path
 
-from quizling import DifficultyLevel, QuizConfig, QuizGenerator
-from quizling.quiz_writer import QuizWriter
+from quizling.base import DifficultyLevel, QuizConfig, QuizGenerator
+from quizling.base.quiz_writer import QuizWriter
 
 
 def parse_args() -> argparse.Namespace:

@@ -3,7 +3,7 @@ import tempfile
 
 
 from pathlib import Path
-from quizling.file_reader import (
+from quizling.base.file_reader import (
     DOCXFileReader,
     FileReaderFactory,
     PDFFileReader,

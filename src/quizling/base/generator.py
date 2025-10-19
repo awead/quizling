@@ -3,8 +3,8 @@ from pathlib import Path
 from pydantic_ai import Agent
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.openai import OpenAIProvider
-from quizling.file_reader import FileReaderFactory
-from quizling.models import (
+from quizling.base.file_reader import FileReaderFactory
+from quizling.base.models import (
     MultipleChoiceQuestion,
     QuizConfig,
     QuizResult,

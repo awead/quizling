@@ -3,14 +3,14 @@ import pytest
 import tempfile
 
 from pathlib import Path
-from quizling.models import (
+from quizling.base.models import (
     AnswerOption,
     DifficultyLevel,
     MultipleChoiceQuestion,
     QuizConfig,
     QuizResult,
 )
-from quizling.quiz_writer import QuizWriter, QuizWriterError
+from quizling.base.quiz_writer import QuizWriter, QuizWriterError
 
 
 class TestQuizWriter:

@@ -3,8 +3,8 @@ import pytest
 
 
 from pathlib import Path
-from quizling.generator import QuizGenerator
-from quizling.models import (
+from quizling.base.generator import QuizGenerator
+from quizling.base.models import (
     AnswerOption,
     DifficultyLevel,
     MultipleChoiceQuestion,
