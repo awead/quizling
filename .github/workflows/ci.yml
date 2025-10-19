@@ -20,6 +20,8 @@ jobs:
       AZURE_OPENAI_KEY: this-is-not-a-key
       AZURE_OPENAI_VERSION: 2024-02-15-preview
       AZURE_OPENAI_DEPLOYMENT: gpt-5-mini
+      MONGO_DATABASE: quizling
+      MONGODB_URI: mongodb://admin:password@localhost:27017/quizling?authSource=admin
       
     steps:
       - name: Checkout code
