@@ -1,4 +1,4 @@
-name: CI
+name: Test Backend
 
 on:
   pull_request:
@@ -22,7 +22,7 @@ jobs:
       AZURE_OPENAI_DEPLOYMENT: gpt-5-mini
       MONGO_DATABASE: quizling
       MONGODB_URI: mongodb://admin:password@localhost:27017/quizling?authSource=admin
-      
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -39,7 +39,9 @@ jobs:
 
       - name: Install dependencies
         run: uv sync
+        working-directory: backend
 
       - name: Run tests
         run: uv run pytest
+        working-directory: backend
 
