@@ -9,3 +9,6 @@ test-cov:
 console:
 	uv run ipython -i src/quizling/utils/console.py
 
+api:
+	uv run uvicorn quizling.api.app:app --reload
+
