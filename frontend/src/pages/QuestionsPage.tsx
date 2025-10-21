@@ -1,8 +1,59 @@
-import Card from '@/components/common/Card'
+import { useState } from 'react'
+import { useQuestions } from '@/hooks/useQuestions'
+import { useDebounce } from '@/hooks/useDebounce'
+import SearchBar from '@/components/questions/SearchBar'
+import QuestionFilters from '@/components/questions/QuestionFilters'
+import QuestionList from '@/components/questions/QuestionList'
+import Pagination from '@/components/questions/Pagination'
+import ErrorMessage from '@/components/common/ErrorMessage'
+import type { DifficultyLevel } from '@/types'
+
+const QUESTIONS_PER_PAGE = 20
 
 export default function QuestionsPage() {
+  const [searchQuery, setSearchQuery] = useState<string>('')
+  const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultyLevel | null>(null)
+  const [currentPage, setCurrentPage] = useState<number>(1)
+
+  // Debounce search query to avoid too many API calls
+  const debouncedSearch = useDebounce(searchQuery, 300)
+
+  // Calculate cursor for pagination (cursor = (page - 1) * limit)
+  const cursor = (currentPage - 1) * QUESTIONS_PER_PAGE
+
+  // Fetch questions with current filters
+  const { questions, isLoading, error, pagination, refetch } = useQuestions({
+    difficulty: selectedDifficulty,
+    search: debouncedSearch,
+    cursor,
+    limit: QUESTIONS_PER_PAGE,
+  })
+
+  // Reset to page 1 when filters change
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value)
+    setCurrentPage(1)
+  }
+
+  const handleDifficultyChange = (difficulty: DifficultyLevel | null) => {
+    setSelectedDifficulty(difficulty)
+    setCurrentPage(1)
+  }
+
+  const handleNextPage = () => {
+    if (pagination.hasMore) {
+      setCurrentPage((prev) => prev + 1)
+    }
+  }
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prev) => prev - 1)
+    }
+  }
+
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-7xl mx-auto">
       <div className="mb-8">
         <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
           Browse Questions
@@ -12,30 +63,43 @@ export default function QuestionsPage() {
         </p>
       </div>
 
-      <Card>
-        <div className="text-center py-12">
-          <svg
-            className="mx-auto h-16 w-16 text-gray-400 mb-4"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-            />
-          </svg>
-          <p className="text-xl text-gray-600 dark:text-gray-400">
-            Questions list will appear here
-          </p>
-          <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">
-            This feature will be implemented in Phase 3
-          </p>
+      {/* Search and Filters */}
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
+        <div className="flex-1">
+          <SearchBar value={searchQuery} onChange={handleSearchChange} />
         </div>
-      </Card>
+        <div className="md:w-48">
+          <QuestionFilters
+            selectedDifficulty={selectedDifficulty}
+            onDifficultyChange={handleDifficultyChange}
+          />
+        </div>
+      </div>
+
+      {/* Error Message */}
+      {error && (
+        <div className="mb-6">
+          <ErrorMessage message={error} onRetry={refetch} />
+        </div>
+      )}
+
+      {/* Question List */}
+      {!error && (
+        <>
+          <QuestionList questions={questions} isLoading={isLoading} />
+
+          {/* Pagination */}
+          {!isLoading && questions.length > 0 && (
+            <Pagination
+              currentPage={currentPage}
+              hasMore={pagination.hasMore}
+              onNext={handleNextPage}
+              onPrevious={handlePreviousPage}
+              total={pagination.total}
+            />
+          )}
+        </>
+      )}
     </div>
   )
 }
