@@ -5,19 +5,44 @@
  * and additional utilities specific to this application.
  */
 
-import { render, RenderOptions } from '@testing-library/react'
-import { ReactElement } from 'react'
+import { render as rtlRender } from '@testing-library/react'
+import type { RenderOptions } from '@testing-library/react'
+import type { ReactElement, ReactNode } from 'react'
+import { MemoryRouter } from 'react-router-dom'
+
+interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
+  initialEntries?: string[]
+  withRouter?: boolean
+}
+
+/**
+ * Wrapper component that provides router context
+ */
+function AllTheProviders({ children, initialEntries = ['/'] }: { children: ReactNode; initialEntries?: string[] }) {
+  return (
+    <MemoryRouter initialEntries={initialEntries}>
+      {children}
+    </MemoryRouter>
+  )
+}
 
 /**
  * Custom render function that wraps components with necessary providers
- * Currently just passes through to RTL render, but ready for future providers
- * (Router, Theme, Auth Context, etc.)
+ * Includes MemoryRouter for testing components with routing
+ * Set withRouter: false to skip router wrapping (for components that already have a router)
  */
 function customRender(
   ui: ReactElement,
-  options?: Omit<RenderOptions, 'wrapper'>
+  { initialEntries = ['/'], withRouter = true, ...options }: CustomRenderOptions = {}
 ) {
-  return render(ui, { ...options })
+  if (!withRouter) {
+    return rtlRender(ui, options)
+  }
+
+  return rtlRender(ui, {
+    wrapper: ({ children }) => <AllTheProviders initialEntries={initialEntries}>{children}</AllTheProviders>,
+    ...options
+  })
 }
 
 // Re-export everything from React Testing Library
