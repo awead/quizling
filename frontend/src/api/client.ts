@@ -11,18 +11,12 @@ import axios, { AxiosError } from 'axios';
 import type { InternalAxiosRequestConfig } from 'axios';
 import type { ErrorResponse } from '@/types';
 
-/**
- * Custom error structure for API errors
- */
 export interface ApiError {
   status?: number;
   detail: string;
   originalError?: unknown;
 }
 
-/**
- * Axios instance configured with base URL, timeout, and interceptors
- */
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
   timeout: Number(import.meta.env.VITE_API_TIMEOUT) || 10000,
@@ -37,7 +31,6 @@ const apiClient = axios.create({
  */
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // Log the request for debugging
     console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`, {
       params: config.params,
       data: config.data,
@@ -62,13 +55,11 @@ apiClient.interceptors.request.use(
  * Handles successful responses and transforms errors into a consistent format
  */
 apiClient.interceptors.response.use(
-  // Pass through successful responses
   (response) => {
     console.log(`[API Response] ${response.status} ${response.config.url}`);
     return response;
   },
 
-  // Transform error responses
   (error: AxiosError<ErrorResponse>) => {
     const apiError: ApiError = {
       detail: 'An unexpected error occurred',
@@ -76,7 +67,6 @@ apiClient.interceptors.response.use(
     };
 
     if (error.response) {
-      // Server responded with error status
       apiError.status = error.response.status;
       apiError.detail = error.response.data?.detail || error.message;
 
@@ -88,14 +78,12 @@ apiClient.interceptors.response.use(
         }
       );
     } else if (error.request) {
-      // Request made but no response received (network error)
       apiError.detail = 'Network error: Unable to reach the server';
       console.error('[API Network Error]', {
         url: error.config?.url,
         message: error.message,
       });
     } else {
-      // Error in request configuration
       apiError.detail = error.message;
       console.error('[API Configuration Error]', error.message);
     }

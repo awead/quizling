@@ -5,14 +5,12 @@ export default function Header() {
     <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo/Brand */}
           <Link to="/" className="flex items-center">
             <h1 className="text-2xl font-bold text-primary-600 dark:text-primary-400">
               Quizling
             </h1>
           </Link>
 
-          {/* Navigation */}
           <nav className="flex items-center space-x-6">
             <Link
               to="/"

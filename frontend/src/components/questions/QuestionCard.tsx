@@ -27,7 +27,6 @@ export default function QuestionCard({ question }: QuestionCardProps) {
     >
       <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer">
         <div className="flex flex-col gap-3">
-          {/* Difficulty Badge */}
           <div className="flex items-center justify-between">
             <span
               className={`inline-block px-3 py-1 rounded-full text-xs font-semibold uppercase ${difficultyColors[question.difficulty]}`}
@@ -36,12 +35,10 @@ export default function QuestionCard({ question }: QuestionCardProps) {
             </span>
           </div>
 
-          {/* Question Text */}
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 line-clamp-2">
             {truncatedQuestion}
           </h3>
 
-          {/* First Answer Preview */}
           <div className="text-sm text-gray-600 dark:text-gray-400">
             <span className="font-medium">{firstAnswer.label}:</span>{' '}
             {firstAnswer.text}

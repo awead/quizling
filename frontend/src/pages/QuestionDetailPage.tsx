@@ -60,7 +60,6 @@ export default function QuestionDetailPage() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      {/* Header with Back Button */}
       <div className="mb-8">
         <div className="mb-4">
           <Link to="/questions">
@@ -75,10 +74,8 @@ export default function QuestionDetailPage() {
         </p>
       </div>
 
-      {/* Question Card */}
       <Card>
         <div className="space-y-6">
-          {/* Difficulty Badge */}
           <div>
             <span
               className={`inline-block px-4 py-2 rounded-full text-sm font-semibold uppercase ${difficultyColors[question.difficulty]}`}
@@ -87,7 +84,6 @@ export default function QuestionDetailPage() {
             </span>
           </div>
 
-          {/* Question Text */}
           <div>
             <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase mb-2">
               Question
@@ -97,7 +93,6 @@ export default function QuestionDetailPage() {
             </p>
           </div>
 
-          {/* Answer Options */}
           <div>
             <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase mb-3">
               Answer Options
@@ -147,7 +142,6 @@ export default function QuestionDetailPage() {
             </div>
           </div>
 
-          {/* Explanation */}
           {question.explanation && (
             <div>
               <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase mb-2">

@@ -43,9 +43,7 @@ export function useQuestion(id: string | undefined): UseQuestionReturn {
   const [error, setError] = useState<string | null>(null);
   const [refetchTrigger, setRefetchTrigger] = useState<number>(0);
 
-  // Fetch question from API
   useEffect(() => {
-    // Don't fetch if id is undefined
     if (!id) {
       setQuestion(null);
       setIsLoading(false);

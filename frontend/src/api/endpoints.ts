@@ -10,25 +10,11 @@
  * Uses functions for parameterized routes to ensure type safety
  */
 export const ENDPOINTS = {
-  /**
-   * Root health endpoint
-   */
   HEALTH: '/',
 
-  /**
-   * Dedicated health check endpoint
-   */
   HEALTH_CHECK: '/health',
 
-  /**
-   * Questions collection endpoint
-   * Supports query parameters: difficulty, search, cursor, limit
-   */
   QUESTIONS: '/questions',
 
-  /**
-   * Single question by ID endpoint
-   * @param id - MongoDB ObjectId string
-   */
   QUESTION_BY_ID: (id: string) => `/questions/${id}`,
 } as const;

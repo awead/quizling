@@ -7,7 +7,6 @@
 
 import type { MultipleChoiceQuestion, DifficultyLevel } from './models';
 
-// API Response types
 export interface PaginatedResponse {
   data: MultipleChoiceQuestion[];
   next_cursor: string | null;
@@ -28,7 +27,6 @@ export interface HealthResponse {
   service?: string;
 }
 
-// API Request types
 export interface QuestionQueryParams {
   difficulty?: DifficultyLevel;
   search?: string;
@@ -36,7 +34,6 @@ export interface QuestionQueryParams {
   limit?: number;
 }
 
-// Frontend-specific types for filters and state
 export interface QuestionFilters {
   difficulty: DifficultyLevel | null;
   search: string;

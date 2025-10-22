@@ -18,10 +18,8 @@ export default function QuestionsPage() {
   // Debounce search query to avoid too many API calls
   const debouncedSearch = useDebounce(searchQuery, 300)
 
-  // Calculate cursor for pagination (cursor = (page - 1) * limit)
   const cursor = (currentPage - 1) * QUESTIONS_PER_PAGE
 
-  // Fetch questions with current filters
   const { questions, isLoading, error, pagination, refetch } = useQuestions({
     difficulty: selectedDifficulty,
     search: debouncedSearch,
@@ -63,7 +61,6 @@ export default function QuestionsPage() {
         </p>
       </div>
 
-      {/* Search and Filters */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <div className="flex-1">
           <SearchBar value={searchQuery} onChange={handleSearchChange} />
@@ -76,19 +73,16 @@ export default function QuestionsPage() {
         </div>
       </div>
 
-      {/* Error Message */}
       {error && (
         <div className="mb-6">
           <ErrorMessage message={error} onRetry={refetch} />
         </div>
       )}
 
-      {/* Question List */}
       {!error && (
         <>
           <QuestionList questions={questions} isLoading={isLoading} />
 
-          {/* Pagination */}
           {!isLoading && questions.length > 0 && (
             <Pagination
               currentPage={currentPage}

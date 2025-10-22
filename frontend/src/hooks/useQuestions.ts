@@ -74,7 +74,6 @@ export function useQuestions(params?: UseQuestionsParams): UseQuestionsReturn {
   });
   const [refetchTrigger, setRefetchTrigger] = useState<number>(0);
 
-  // Fetch questions from API
   useEffect(() => {
     let isMounted = true;
 
@@ -83,7 +82,6 @@ export function useQuestions(params?: UseQuestionsParams): UseQuestionsReturn {
       setError(null);
 
       try {
-        // Filter out null difficulty value
         const queryParams: {
           difficulty?: DifficultyLevel;
           search?: string;
