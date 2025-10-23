@@ -203,6 +203,7 @@ class TestMongoDBClient:
             assert result is not None
             assert result.question == sample_question.question
             assert result.correct_answer == sample_question.correct_answer
+            assert result.id == "test_id"
 
     def test_get_question_not_found(self) -> None:
         """Test retrieving a question that doesn't exist."""

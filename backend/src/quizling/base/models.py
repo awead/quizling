@@ -22,6 +22,10 @@ class AnswerOption(BaseModel):
 class MultipleChoiceQuestion(BaseModel):
     VALID_LABELS: ClassVar[frozenset[str]] = frozenset(["A", "B", "C", "D"])
 
+    id: str | None = Field(
+        default=None, description="Optional unique identifier for the question"
+    )
+
     question: str = Field(description="The question text", min_length=1)
 
     options: list[AnswerOption] = Field(
