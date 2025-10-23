@@ -49,7 +49,7 @@ class MongoDBClient:
         self.close()
 
     def insert_question(self, question: MultipleChoiceQuestion) -> str:
-        question_dict = question.model_dump()
+        question_dict = question.model_dump(exclude={"id"})
         result = self.questions.insert_one(question_dict)
         return str(result.inserted_id)
 
@@ -57,7 +57,7 @@ class MongoDBClient:
         if not questions:
             return []
 
-        question_dicts = [q.model_dump() for q in questions]
+        question_dicts = [q.model_dump(exclude={"id"}) for q in questions]
         result = self.questions.insert_many(question_dicts)
         return [str(oid) for oid in result.inserted_ids]
 
@@ -67,8 +67,7 @@ class MongoDBClient:
         try:
             doc = self.questions.find_one({"_id": ObjectId(question_id)})
             if doc:
-                # Remove MongoDB's _id field before creating model
-                doc.pop("_id", None)
+                doc["id"] = str(doc.pop("_id"))
                 return MultipleChoiceQuestion(**doc)
             return None
         except Exception:
@@ -80,7 +79,7 @@ class MongoDBClient:
         docs = self.questions.find({"difficulty": difficulty})
         questions = []
         for doc in docs:
-            doc.pop("_id", None)
+            doc["id"] = str(doc.pop("_id"))
             questions.append(MultipleChoiceQuestion(**doc))
         return questions
 
@@ -93,7 +92,7 @@ class MongoDBClient:
 
         questions = []
         for doc in cursor:
-            doc.pop("_id", None)
+            doc["id"] = str(doc.pop("_id"))
             questions.append(MultipleChoiceQuestion(**doc))
         return questions
 
@@ -103,7 +102,7 @@ class MongoDBClient:
         )
         questions = []
         for doc in docs:
-            doc.pop("_id", None)
+            doc["id"] = str(doc.pop("_id"))
             questions.append(MultipleChoiceQuestion(**doc))
         return questions
 
