@@ -13,7 +13,7 @@ export interface AnswerOption {
 }
 
 export interface MultipleChoiceQuestion {
-  _id?: string; 
+  id: string; 
   question: string;
   options: AnswerOption[];
   correct_answer: 'A' | 'B' | 'C' | 'D';

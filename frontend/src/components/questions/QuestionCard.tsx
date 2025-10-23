@@ -22,7 +22,7 @@ export default function QuestionCard({ question }: QuestionCardProps) {
 
   return (
     <Link
-      to={`/questions/${question._id}`}
+      to={`/questions/${question.id}`}
       className="block transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded-lg"
     >
       <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer">

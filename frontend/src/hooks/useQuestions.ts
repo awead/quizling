@@ -27,7 +27,7 @@
  *   return (
  *     <div>
  *       {questions.map((q) => (
- *         <QuestionCard key={q._id} question={q} />
+ *         <QuestionCard key={q.id} question={q} />
  *       ))}
  *       {pagination.hasMore && <button>Load More</button>}
  *     </div>

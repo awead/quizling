@@ -70,7 +70,7 @@ export default function QuestionDetailPage() {
           Question Details
         </h1>
         <p className="text-lg text-gray-600 dark:text-gray-300">
-          {question._id}
+          {question.id}
         </p>
       </div>
 

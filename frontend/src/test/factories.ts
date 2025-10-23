@@ -33,7 +33,7 @@ export const createAnswerOption = (
 export const createQuestion = (
   overrides?: Partial<MultipleChoiceQuestion>
 ): MultipleChoiceQuestion => ({
-  _id: '507f1f77bcf86cd799439011',
+  id: '507f1f77bcf86cd799439011',
   question: 'What is the capital of France?',
   options: [
     { label: 'A', text: 'London' },
@@ -56,7 +56,7 @@ export const createQuestions = (
 ): MultipleChoiceQuestion[] => {
   return Array.from({ length: count }, (_, i) =>
     createQuestion({
-      _id: `507f1f77bcf86cd79943901${i}`,
+      id: `507f1f77bcf86cd79943901${i}`,
       question: `Sample question ${i + 1}?`,
       ...overrides,
     })

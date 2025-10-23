@@ -29,7 +29,7 @@ describe('QuestionCard', () => {
   })
 
   it('should link to question detail page', () => {
-    const question = createQuestion({ _id: '507f1f77bcf86cd799439011' })
+    const question = createQuestion({ id: '507f1f77bcf86cd799439011' })
 
     render(<QuestionCard question={question} />)
 

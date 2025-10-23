@@ -179,7 +179,7 @@ describe('Questions API Service', () => {
         ENDPOINTS.QUESTION_BY_ID(questionId)
       )
       expect(result).toEqual(mockResponse)
-      expect(result.data._id).toBe('507f1f77bcf86cd799439011')
+      expect(result.data.id).toBe('507f1f77bcf86cd799439011')
     })
 
     it('should handle 404 when question not found', async () => {
