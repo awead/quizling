@@ -53,13 +53,14 @@ export function useQuestion(id: string | undefined): UseQuestionReturn {
     }
 
     let isMounted = true;
+    const abortController = new AbortController();
 
     const fetchQuestion = async () => {
       setIsLoading(true);
       setError(null);
 
       try {
-        const response = await fetchQuestionById(id);
+        const response = await fetchQuestionById(id, { signal: abortController.signal });
         if (isMounted) {
           setQuestion(response.data);
           setError(null);
@@ -84,9 +85,10 @@ export function useQuestion(id: string | undefined): UseQuestionReturn {
 
     fetchQuestion();
 
-    // Cleanup function to prevent state updates on unmounted component
+    // Cleanup function to prevent state updates on unmounted component and cancel pending requests
     return () => {
       isMounted = false;
+      abortController.abort();
     };
   }, [id, refetchTrigger]);
 

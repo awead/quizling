@@ -59,9 +59,10 @@ describe('useQuestions', () => {
       expect(result.current.isLoading).toBe(false)
     })
 
-    expect(fetchQuestions).toHaveBeenCalledWith({
-      difficulty: 'hard',
-    })
+    expect(fetchQuestions).toHaveBeenCalledWith(
+      { difficulty: 'hard' },
+      { signal: expect.any(AbortSignal) }
+    )
     expect(result.current.questions).toEqual(mockQuestions)
   })
 

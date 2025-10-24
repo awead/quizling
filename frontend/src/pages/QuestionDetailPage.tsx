@@ -4,13 +4,7 @@ import Card from '@/components/common/Card'
 import LoadingSpinner from '@/components/common/LoadingSpinner'
 import ErrorMessage from '@/components/common/ErrorMessage'
 import Button from '@/components/common/Button'
-import type { DifficultyLevel } from '@/types'
-
-const difficultyColors: Record<DifficultyLevel, string> = {
-  easy: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-  medium: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-  hard: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-}
+import { getDifficultyColor } from '@/utils/difficulty'
 
 export default function QuestionDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -78,7 +72,7 @@ export default function QuestionDetailPage() {
         <div className="space-y-6">
           <div>
             <span
-              className={`inline-block px-4 py-2 rounded-full text-sm font-semibold uppercase ${difficultyColors[question.difficulty]}`}
+              className={`inline-block px-4 py-2 rounded-full text-sm font-semibold uppercase ${getDifficultyColor(question.difficulty)}`}
             >
               {question.difficulty}
             </span>

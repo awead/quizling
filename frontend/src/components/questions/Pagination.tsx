@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import Button from '../common/Button'
 
 export interface PaginationProps {
@@ -8,7 +9,7 @@ export interface PaginationProps {
   total?: number | null
 }
 
-export default function Pagination({
+function Pagination({
   currentPage,
   hasMore,
   onNext,
@@ -49,3 +50,5 @@ export default function Pagination({
     </div>
   )
 }
+
+export default memo(Pagination)

@@ -77,6 +77,7 @@ export function useQuestions(params?: UseQuestionsParams): UseQuestionsReturn {
 
   useEffect(() => {
     let isMounted = true;
+    const abortController = new AbortController();
 
     const loadQuestions = async () => {
       setIsLoading(true);
@@ -103,7 +104,7 @@ export function useQuestions(params?: UseQuestionsParams): UseQuestionsReturn {
           queryParams.limit = params.limit;
         }
 
-        const response = await fetchQuestions(queryParams);
+        const response = await fetchQuestions(queryParams, { signal: abortController.signal });
 
         if (isMounted) {
           setQuestions(response.data);
@@ -139,9 +140,10 @@ export function useQuestions(params?: UseQuestionsParams): UseQuestionsReturn {
 
     loadQuestions();
 
-    // Cleanup function to prevent state updates on unmounted component
+    // Cleanup function to prevent state updates on unmounted component and cancel pending requests
     return () => {
       isMounted = false;
+      abortController.abort();
     };
   }, [params?.difficulty, params?.search, params?.cursor, params?.limit, refetchTrigger]);
 

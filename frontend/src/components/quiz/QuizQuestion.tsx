@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 import type { MultipleChoiceQuestion, AnswerOption as AnswerOptionType } from '@/types';
 import AnswerOption from './AnswerOption';
+import { getDifficultyColor } from '@/utils/difficulty';
+import { useFocusOnMount } from '@/hooks';
 
 export interface QuizQuestionProps {
   question: MultipleChoiceQuestion;
@@ -22,19 +24,8 @@ export default function QuizQuestion({
   // Shuffle is already done by the backend - options are in the correct order
   const options = useMemo(() => question.options, [question.options]);
 
-  // Get difficulty badge color
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case 'easy':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-      case 'medium':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
-      case 'hard':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
-      default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
-    }
-  };
+  // Focus the question heading when it mounts
+  const headingRef = useFocusOnMount<HTMLHeadingElement>();
 
   return (
     <div className="space-y-6">
@@ -52,7 +43,11 @@ export default function QuizQuestion({
 
       {/* Question text */}
       <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white leading-relaxed">
+        <h2
+          ref={headingRef}
+          tabIndex={-1}
+          className="text-xl font-semibold text-gray-900 dark:text-white leading-relaxed focus:outline-none"
+        >
           {question.question}
         </h2>
       </div>

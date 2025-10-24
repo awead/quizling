@@ -56,7 +56,8 @@ describe('QuestionsPage', () => {
     // Should make a new API call with difficulty filter
     await waitFor(() => {
       expect(fetchQuestions).toHaveBeenCalledWith(
-        expect.objectContaining({ difficulty: 'hard' })
+        expect.objectContaining({ difficulty: 'hard' }),
+        expect.objectContaining({ signal: expect.any(AbortSignal) })
       )
     })
   })
@@ -81,7 +82,8 @@ describe('QuestionsPage', () => {
     await waitFor(
       () => {
         expect(fetchQuestions).toHaveBeenCalledWith(
-          expect.objectContaining({ search: 'test' })
+          expect.objectContaining({ search: 'test' }),
+          expect.objectContaining({ signal: expect.any(AbortSignal) })
         )
       },
       { timeout: 1000 }
@@ -111,7 +113,8 @@ describe('QuestionsPage', () => {
     // Should fetch next page
     await waitFor(() => {
       expect(fetchQuestions).toHaveBeenCalledWith(
-        expect.objectContaining({ cursor: 20 })
+        expect.objectContaining({ cursor: 20 }),
+        expect.objectContaining({ signal: expect.any(AbortSignal) })
       )
     })
   })

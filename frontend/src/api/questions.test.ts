@@ -48,6 +48,7 @@ describe('Questions API Service', () => {
 
       expect(apiClient.get).toHaveBeenCalledWith(ENDPOINTS.QUESTIONS, {
         params: undefined,
+        signal: undefined,
       })
       expect(result).toEqual(mockResponse)
     })
@@ -63,6 +64,7 @@ describe('Questions API Service', () => {
 
       expect(apiClient.get).toHaveBeenCalledWith(ENDPOINTS.QUESTIONS, {
         params: { difficulty: 'hard' },
+        signal: undefined,
       })
       expect(result.data).toHaveLength(3)
       expect(result.data[0].difficulty).toBe('hard')
@@ -77,6 +79,7 @@ describe('Questions API Service', () => {
 
       expect(apiClient.get).toHaveBeenCalledWith(ENDPOINTS.QUESTIONS, {
         params: { search: 'JavaScript' },
+        signal: undefined,
       })
       expect(result).toEqual(mockResponse)
     })
@@ -95,6 +98,7 @@ describe('Questions API Service', () => {
 
       expect(apiClient.get).toHaveBeenCalledWith(ENDPOINTS.QUESTIONS, {
         params: { cursor: 0, limit: 20 },
+        signal: undefined,
       })
       expect(result.has_more).toBe(true)
       expect(result.next_cursor).toBe('20')
@@ -119,6 +123,7 @@ describe('Questions API Service', () => {
           cursor: 10,
           limit: 10,
         },
+        signal: undefined,
       })
     })
 
@@ -176,7 +181,8 @@ describe('Questions API Service', () => {
       const result = await fetchQuestionById(questionId)
 
       expect(apiClient.get).toHaveBeenCalledWith(
-        ENDPOINTS.QUESTION_BY_ID(questionId)
+        ENDPOINTS.QUESTION_BY_ID(questionId),
+        { signal: undefined }
       )
       expect(result).toEqual(mockResponse)
       expect(result.data.id).toBe('507f1f77bcf86cd799439011')
@@ -231,7 +237,10 @@ describe('Questions API Service', () => {
 
       const result = await healthCheck()
 
-      expect(apiClient.get).toHaveBeenCalledWith(ENDPOINTS.HEALTH_CHECK)
+      expect(apiClient.get).toHaveBeenCalledWith(
+        ENDPOINTS.HEALTH_CHECK,
+        { signal: undefined }
+      )
       expect(result.status).toBe('healthy')
       expect(result.service).toBe('quizling-api')
     })
