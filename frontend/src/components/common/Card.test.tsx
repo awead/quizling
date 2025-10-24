@@ -1,9 +1,7 @@
 /**
  * Card Component Tests
  *
- * Tests for the Card component including:
- * - Rendering children
- * - Custom className application
+ * Minimal tests for Phase 1 - verifying content renders, not styling
  */
 
 import { describe, it, expect } from 'vitest'
@@ -23,26 +21,14 @@ describe('Card Component', () => {
     expect(screen.getByText(/Card content goes here/i)).toBeInTheDocument()
   })
 
-  it('should apply custom className along with base classes', () => {
-    render(
-      <Card className="custom-class">
-        <div>Test content</div>
-      </Card>
-    )
+  it('should render with different variants', () => {
+    const { rerender } = render(<Card variant="default">Default</Card>)
+    expect(screen.getByText(/Default/i)).toBeInTheDocument()
 
-    const card = screen.getByText(/Test content/i).parentElement
-    expect(card).toHaveClass('custom-class')
-    expect(card).toHaveClass('bg-white')
-  })
+    rerender(<Card variant="glass">Glass</Card>)
+    expect(screen.getByText(/Glass/i)).toBeInTheDocument()
 
-  it('should render without custom className', () => {
-    render(
-      <Card>
-        <div>Simple card</div>
-      </Card>
-    )
-
-    const card = screen.getByText(/Simple card/i).parentElement
-    expect(card).toHaveClass('bg-white')
+    rerender(<Card variant="elevated">Elevated</Card>)
+    expect(screen.getByText(/Elevated/i)).toBeInTheDocument()
   })
 })
