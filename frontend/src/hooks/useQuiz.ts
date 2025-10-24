@@ -37,6 +37,7 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import { fetchQuestions } from '@/api';
+import { ApiError } from '@/api/errors';
 import type { MultipleChoiceQuestion } from '@/types';
 
 export interface UserAnswer {
@@ -99,7 +100,12 @@ export function useQuiz(questionCount: number = 15): UseQuizReturn {
       setQuestions(response.data);
       setError(null);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to load quiz questions';
+      // Handle ApiError instances from the API client
+      const errorMessage = err instanceof ApiError
+        ? err.message
+        : err instanceof Error
+        ? err.message
+        : 'Failed to load quiz questions';
       setError(errorMessage);
       setQuestions([]);
     } finally {

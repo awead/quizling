@@ -150,7 +150,14 @@ export default function QuizInterface({ questionCount = 15 }: QuizInterfaceProps
   return (
     <div className="space-y-6">
       {/* Progress bar */}
-      <div className="bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
+      <div
+        className="bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden"
+        role="progressbar"
+        aria-valuenow={currentQuestionIndex + 1}
+        aria-valuemin={1}
+        aria-valuemax={totalQuestions}
+        aria-label={`Quiz progress: question ${currentQuestionIndex + 1} of ${totalQuestions}`}
+      >
         <div
           className="bg-primary-600 dark:bg-primary-500 h-full transition-all duration-300 ease-out"
           style={{
@@ -177,6 +184,7 @@ export default function QuizInterface({ questionCount = 15 }: QuizInterfaceProps
             onClick={previousQuestion}
             disabled={!canGoPrevious}
             variant="secondary"
+            aria-label="Go to previous question"
           >
             <svg
               className="w-5 h-5 mr-2 inline"
@@ -224,6 +232,7 @@ export default function QuizInterface({ questionCount = 15 }: QuizInterfaceProps
               onClick={nextQuestion}
               disabled={!canGoNext}
               variant="primary"
+              aria-label={`Go to question ${currentQuestionIndex + 2} of ${totalQuestions}`}
             >
               Next
               <svg

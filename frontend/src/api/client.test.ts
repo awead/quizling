@@ -6,44 +6,42 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import type { ApiError } from './client'
+import { ApiError } from './errors'
 
 describe('API Client', () => {
-  describe('ApiError Type', () => {
-    it('should have correct structure with all properties', () => {
-      const error: ApiError = {
-        status: 404,
-        detail: 'Not found',
-        originalError: new Error('Original'),
-      }
+  describe('ApiError Class', () => {
+    it('should create error with all properties', () => {
+      const originalError = new Error('Original')
+      const error = new ApiError('Not found', 404, originalError)
 
+      expect(error.message).toBe('Not found')
       expect(error.status).toBe(404)
-      expect(error.detail).toBe('Not found')
-      expect(error.originalError).toBeInstanceOf(Error)
+      expect(error.originalError).toBe(originalError)
+      expect(error.name).toBe('ApiError')
+      expect(error).toBeInstanceOf(Error)
+      expect(error).toBeInstanceOf(ApiError)
     })
 
-    it('should allow optional status', () => {
-      const error: ApiError = {
-        detail: 'Network error',
-      }
+    it('should create error with optional status', () => {
+      const error = new ApiError('Network error')
 
+      expect(error.message).toBe('Network error')
       expect(error.status).toBeUndefined()
-      expect(error.detail).toBe('Network error')
+      expect(error.name).toBe('ApiError')
+      expect(error).toBeInstanceOf(Error)
     })
 
-    it('should allow optional originalError', () => {
-      const error: ApiError = {
-        status: 500,
-        detail: 'Server error',
-      }
+    it('should create error with optional originalError', () => {
+      const error = new ApiError('Server error', 500)
 
+      expect(error.message).toBe('Server error')
       expect(error.status).toBe(500)
-      expect(error.detail).toBe('Server error')
       expect(error.originalError).toBeUndefined()
+      expect(error.name).toBe('ApiError')
     })
 
     it('should support different error status codes', () => {
-      const errors: ApiError[] = [
+      const errorData = [
         { status: 400, detail: 'Bad request' },
         { status: 401, detail: 'Unauthorized' },
         { status: 403, detail: 'Forbidden' },
@@ -52,11 +50,12 @@ describe('API Client', () => {
         { status: 503, detail: 'Service unavailable' },
       ]
 
-      errors.forEach((error) => {
-        expect(error).toHaveProperty('status')
-        expect(error).toHaveProperty('detail')
-        expect(typeof error.status).toBe('number')
-        expect(typeof error.detail).toBe('string')
+      errorData.forEach(({ status, detail }) => {
+        const error = new ApiError(detail, status)
+        expect(error.message).toBe(detail)
+        expect(error.status).toBe(status)
+        expect(error).toBeInstanceOf(ApiError)
+        expect(error.name).toBe('ApiError')
       })
     })
   })

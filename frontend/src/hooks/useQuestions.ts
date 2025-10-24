@@ -38,6 +38,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { fetchQuestions } from '@/api';
+import { ApiError } from '@/api/errors';
 import type { MultipleChoiceQuestion, DifficultyLevel } from '@/types';
 
 export interface UseQuestionsParams {
@@ -115,7 +116,12 @@ export function useQuestions(params?: UseQuestionsParams): UseQuestionsReturn {
         }
       } catch (err) {
         if (isMounted) {
-          const errorMessage = err instanceof Error ? err.message : 'Failed to fetch questions';
+          // Handle ApiError instances from the API client
+          const errorMessage = err instanceof ApiError
+            ? err.message
+            : err instanceof Error
+            ? err.message
+            : 'Failed to fetch questions';
           setError(errorMessage);
           setQuestions([]);
           setPagination({

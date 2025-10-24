@@ -28,6 +28,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { fetchQuestionById } from '@/api';
+import { ApiError } from '@/api/errors';
 import type { MultipleChoiceQuestion } from '@/types';
 
 interface UseQuestionReturn {
@@ -65,7 +66,12 @@ export function useQuestion(id: string | undefined): UseQuestionReturn {
         }
       } catch (err) {
         if (isMounted) {
-          const errorMessage = err instanceof Error ? err.message : 'Failed to fetch question';
+          // Handle ApiError instances from the API client
+          const errorMessage = err instanceof ApiError
+            ? err.message
+            : err instanceof Error
+            ? err.message
+            : 'Failed to fetch question';
           setError(errorMessage);
           setQuestion(null);
         }
