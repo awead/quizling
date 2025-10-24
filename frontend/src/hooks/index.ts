@@ -8,4 +8,6 @@
 export { useDebounce } from './useDebounce';
 export { useQuestion } from './useQuestion';
 export { useQuestions } from './useQuestions';
+export { useQuiz } from './useQuiz';
 export type { UseQuestionsParams } from './useQuestions';
+export type { UserAnswer } from './useQuiz';
