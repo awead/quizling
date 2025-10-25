@@ -14,13 +14,29 @@ const QUESTIONS_PER_PAGE = 20
 export default function QuestionsPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   
-  // Initialize state from URL parameters
+  // Helper function to validate difficulty parameter
+  const validateDifficulty = (value: string | null): DifficultyLevel | null => {
+    if (!value) return null
+    const validDifficulties: DifficultyLevel[] = ['easy', 'medium', 'hard']
+    return validDifficulties.includes(value as DifficultyLevel) 
+      ? (value as DifficultyLevel) 
+      : null
+  }
+  
+  // Helper function to validate page parameter
+  const validatePage = (value: string | null): number => {
+    if (!value) return 1
+    const parsed = parseInt(value, 10)
+    return !isNaN(parsed) && parsed > 0 ? parsed : 1
+  }
+  
+  // Initialize state from URL parameters with validation
   const [searchQuery, setSearchQuery] = useState<string>(searchParams.get('search') || '')
   const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultyLevel | null>(
-    (searchParams.get('difficulty') as DifficultyLevel) || null
+    validateDifficulty(searchParams.get('difficulty'))
   )
   const [currentPage, setCurrentPage] = useState<number>(
-    parseInt(searchParams.get('page') || '1', 10)
+    validatePage(searchParams.get('page'))
   )
 
   // Update URL when state changes
