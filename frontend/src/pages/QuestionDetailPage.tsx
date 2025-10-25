@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useQuestion } from '@/hooks/useQuestion'
 import Card from '@/components/common/Card'
@@ -9,6 +10,7 @@ import { getDifficultyColor } from '@/utils/difficulty'
 export default function QuestionDetailPage() {
   const { id } = useParams<{ id: string }>()
   const { question, isLoading, error, refetch } = useQuestion(id)
+  const [showAnswers, setShowAnswers] = useState(false)
 
   if (isLoading) {
     return (
@@ -88,17 +90,26 @@ export default function QuestionDetailPage() {
           </div>
 
           <div>
-            <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase mb-3">
-              Answer Options
-            </h2>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase">
+                Answer Options
+              </h2>
+              <Button
+                onClick={() => setShowAnswers(!showAnswers)}
+                variant={showAnswers ? 'secondary' : 'primary'}
+              >
+                {showAnswers ? 'Hide Answer' : 'Show Answer'}
+              </Button>
+            </div>
             <div className="space-y-3">
               {question.options.map((option) => {
                 const isCorrect = option.label === question.correct_answer
+                const shouldHighlight = showAnswers && isCorrect
                 return (
                   <div
                     key={option.label}
                     className={`p-4 rounded-lg border-2 transition-colors ${
-                      isCorrect
+                      shouldHighlight
                         ? 'bg-green-50 dark:bg-green-900/20 border-green-500 dark:border-green-600'
                         : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
                     }`}
@@ -106,7 +117,7 @@ export default function QuestionDetailPage() {
                     <div className="flex items-start">
                       <span
                         className={`inline-flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm mr-3 flex-shrink-0 ${
-                          isCorrect
+                          shouldHighlight
                             ? 'bg-green-500 text-white'
                             : 'bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200'
                         }`}
@@ -116,14 +127,14 @@ export default function QuestionDetailPage() {
                       <div className="flex-1">
                         <p
                           className={`text-base ${
-                            isCorrect
+                            shouldHighlight
                               ? 'text-green-900 dark:text-green-100 font-medium'
                               : 'text-gray-800 dark:text-gray-200'
                           }`}
                         >
                           {option.text}
                         </p>
-                        {isCorrect && (
+                        {shouldHighlight && (
                           <p className="text-sm text-green-700 dark:text-green-300 mt-1">
                             Correct Answer
                           </p>
@@ -136,7 +147,7 @@ export default function QuestionDetailPage() {
             </div>
           </div>
 
-          {question.explanation && (
+          {question.explanation && showAnswers && (
             <div>
               <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase mb-2">
                 Explanation
