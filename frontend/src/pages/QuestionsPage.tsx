@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useQuestions } from '@/hooks/useQuestions'
 import { useDebounce } from '@/hooks/useDebounce'
 import SearchBar from '@/components/questions/SearchBar'
@@ -11,9 +12,33 @@ import type { DifficultyLevel } from '@/types'
 const QUESTIONS_PER_PAGE = 20
 
 export default function QuestionsPage() {
-  const [searchQuery, setSearchQuery] = useState<string>('')
-  const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultyLevel | null>(null)
-  const [currentPage, setCurrentPage] = useState<number>(1)
+  const [searchParams, setSearchParams] = useSearchParams()
+  
+  // Initialize state from URL parameters
+  const [searchQuery, setSearchQuery] = useState<string>(searchParams.get('search') || '')
+  const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultyLevel | null>(
+    (searchParams.get('difficulty') as DifficultyLevel) || null
+  )
+  const [currentPage, setCurrentPage] = useState<number>(
+    parseInt(searchParams.get('page') || '1', 10)
+  )
+
+  // Update URL when state changes
+  useEffect(() => {
+    const newParams = new URLSearchParams()
+    
+    if (searchQuery) {
+      newParams.set('search', searchQuery)
+    }
+    if (selectedDifficulty) {
+      newParams.set('difficulty', selectedDifficulty)
+    }
+    if (currentPage > 1) {
+      newParams.set('page', currentPage.toString())
+    }
+    
+    setSearchParams(newParams, { replace: true })
+  }, [searchQuery, selectedDifficulty, currentPage, setSearchParams])
 
   // Debounce search query to avoid too many API calls
   const debouncedSearch = useDebounce(searchQuery, 300)

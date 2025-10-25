@@ -118,4 +118,26 @@ describe('QuestionsPage', () => {
       )
     })
   })
+
+  it('should initialize state from URL search parameters', async () => {
+    const mockQuestions = createQuestions(5)
+    const mockResponse = createPaginatedResponse({ data: mockQuestions })
+    vi.mocked(fetchQuestions).mockResolvedValue(mockResponse)
+
+    render(<QuestionsPage />, {
+      initialEntries: ['/questions?search=test&difficulty=hard&page=3'],
+    })
+
+    // Should make API call with parameters from URL
+    await waitFor(() => {
+      expect(fetchQuestions).toHaveBeenCalledWith(
+        expect.objectContaining({ 
+          search: 'test',
+          difficulty: 'hard',
+          cursor: 40 // page 3 with 20 per page = cursor 40
+        }),
+        expect.objectContaining({ signal: expect.any(AbortSignal) })
+      )
+    })
+  })
 })
