@@ -37,6 +37,17 @@ describe('QuestionCard', () => {
     expect(link).toHaveAttribute('href', '/questions/507f1f77bcf86cd799439011')
   })
 
+  it('should preserve search parameters in question detail link', () => {
+    const question = createQuestion({ id: '507f1f77bcf86cd799439011' })
+
+    render(<QuestionCard question={question} />, {
+      initialEntries: ['/questions?search=test&difficulty=easy'],
+    })
+
+    const link = screen.getByRole('link')
+    expect(link).toHaveAttribute('href', '/questions/507f1f77bcf86cd799439011?search=test&difficulty=easy')
+  })
+
   it('should truncate long question text', () => {
     const longQuestion = 'A'.repeat(150)
     const question = createQuestion({ question: longQuestion })
