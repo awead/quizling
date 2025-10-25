@@ -2,7 +2,7 @@
  * Tests for QuestionDetailPage
  */
 
-import { render, screen, waitFor } from '@/test/test-utils'
+import { render, screen, waitFor, userEvent } from '@/test/test-utils'
 import QuestionDetailPage from './QuestionDetailPage'
 import { fetchQuestionById } from '@/api'
 import { createQuestion, createQuestionResponse } from '@/test/factories'
@@ -36,7 +36,7 @@ describe('QuestionDetailPage', () => {
     expect(screen.getByRole('status')).toBeInTheDocument()
   })
 
-  it('should display question details when loaded', async () => {
+  it('should display question details when loaded with answers hidden by default', async () => {
     const mockQuestion = createQuestion({
       question: 'What is the capital of France?',
       difficulty: 'medium',
@@ -59,7 +59,8 @@ describe('QuestionDetailPage', () => {
     })
 
     expect(screen.getByText('medium')).toBeInTheDocument()
-    expect(screen.getByText('Paris is the capital of France.')).toBeInTheDocument()
+    expect(screen.queryByText('Paris is the capital of France.')).not.toBeInTheDocument()
+    expect(screen.getByText('Show Answer')).toBeInTheDocument()
   })
 
   it('should show back button', async () => {
@@ -101,5 +102,41 @@ describe('QuestionDetailPage', () => {
 
     // Should show back button even in error state
     expect(screen.getByText('Back to Questions')).toBeInTheDocument()
+  })
+
+  it('shows or hides answers as needed', async () => {
+    const mockQuestion = createQuestion({
+      question: 'What is the capital of France?',
+      correct_answer: 'A',
+      explanation: 'Paris is the capital of France.',
+    })
+    const mockResponse = createQuestionResponse({ data: mockQuestion })
+    vi.mocked(fetchQuestionById).mockResolvedValue(mockResponse)
+
+    render(
+      <Routes>
+        <Route path="/questions/:id" element={<QuestionDetailPage />} />
+      </Routes>,
+      {
+        initialEntries: ['/questions/507f1f77bcf86cd799439011'],
+      }
+    )
+
+    await waitFor(() => {
+      expect(screen.getByText('What is the capital of France?')).toBeInTheDocument()
+    })
+
+    const showAnswerButton = screen.getByText('Show Answer')
+    await userEvent.click(showAnswerButton)
+
+    expect(screen.getByText('Correct Answer')).toBeInTheDocument()
+    expect(screen.getByText('Paris is the capital of France.')).toBeInTheDocument()
+
+    const hideAnswerButton = screen.getByText('Hide Answer')
+    await userEvent.click(hideAnswerButton)
+
+    expect(screen.queryByText('Correct Answer')).not.toBeInTheDocument()
+    expect(screen.queryByText('Paris is the capital of France.')).not.toBeInTheDocument()
+    expect(screen.getByText('Show Answer')).toBeInTheDocument()
   })
 })
