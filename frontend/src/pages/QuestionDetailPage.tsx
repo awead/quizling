@@ -103,8 +103,7 @@ export default function QuestionDetailPage() {
             </div>
             <div className="space-y-3">
               {question.options.map((option) => {
-                const isCorrect = option.label === question.correct_answer
-                const shouldHighlight = showAnswers && isCorrect
+                const shouldHighlight = showAnswers && (option.label === question.correct_answer)
                 return (
                   <div
                     key={option.label}
