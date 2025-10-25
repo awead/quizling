@@ -2,7 +2,7 @@
  * Tests for QuestionDetailPage
  */
 
-import { render, screen, waitFor } from '@/test/test-utils'
+import { render, screen, waitFor, userEvent } from '@/test/test-utils'
 import QuestionDetailPage from './QuestionDetailPage'
 import { fetchQuestionById } from '@/api'
 import { createQuestion, createQuestionResponse } from '@/test/factories'
@@ -158,7 +158,7 @@ describe('QuestionDetailPage', () => {
 
     // Click Show Answer button
     const showAnswerButton = screen.getByText('Show Answer')
-    await showAnswerButton.click()
+    await userEvent.click(showAnswerButton)
 
     // Answers should now be visible
     expect(screen.getByText('Correct Answer')).toBeInTheDocument()
@@ -190,14 +190,14 @@ describe('QuestionDetailPage', () => {
 
     // Show answers first
     const showAnswerButton = screen.getByText('Show Answer')
-    await showAnswerButton.click()
+    await userEvent.click(showAnswerButton)
 
     expect(screen.getByText('Correct Answer')).toBeInTheDocument()
     expect(screen.getByText('Paris is the capital of France.')).toBeInTheDocument()
 
     // Now hide answers
     const hideAnswerButton = screen.getByText('Hide Answer')
-    await hideAnswerButton.click()
+    await userEvent.click(hideAnswerButton)
 
     // Answers should be hidden again
     expect(screen.queryByText('Correct Answer')).not.toBeInTheDocument()
