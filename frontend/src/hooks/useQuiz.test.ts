@@ -56,7 +56,10 @@ describe('useQuiz', () => {
 
     expect(result.current.questions).toEqual(mockQuestions);
     expect(result.current.totalQuestions).toBe(15);
-    expect(fetchQuestions).toHaveBeenCalledWith({ limit: 15 });
+    expect(fetchQuestions).toHaveBeenCalledWith(
+      { limit: 15 },
+      { signal: expect.any(AbortSignal) }
+    );
   });
 
   it('should handle API errors when fetching questions', async () => {

@@ -37,7 +37,10 @@ describe('useQuestion', () => {
 
     expect(result.current.question).toEqual(mockQuestion)
     expect(result.current.error).toBeNull()
-    expect(fetchQuestionById).toHaveBeenCalledWith('507f1f77bcf86cd799439011')
+    expect(fetchQuestionById).toHaveBeenCalledWith(
+      '507f1f77bcf86cd799439011',
+      { signal: expect.any(AbortSignal) }
+    )
   })
 
   it('should handle loading state correctly', async () => {

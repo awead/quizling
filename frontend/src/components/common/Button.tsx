@@ -40,6 +40,8 @@ export default function Button({
     <button
       className={`rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 shadow-soft hover:shadow-lg hover:scale-105 active:scale-95 ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
       disabled={isDisabled}
+      aria-busy={isLoading}
+      aria-disabled={isDisabled}
       {...props}
     >
       {isLoading ? (
@@ -49,6 +51,7 @@ export default function Button({
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
+            aria-hidden="true"
           >
             <circle
               className="opacity-25"

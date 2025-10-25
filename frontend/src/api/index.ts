@@ -6,6 +6,6 @@
  */
 
 export { default as apiClient } from './client';
-export type { ApiError } from './client';
+export { ApiError } from './errors';
 export { ENDPOINTS } from './endpoints';
 export { fetchQuestions, fetchQuestionById, healthCheck } from './questions';

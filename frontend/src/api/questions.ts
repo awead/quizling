@@ -22,6 +22,7 @@ import type {
  * @param params.search - Search term to filter questions by text content
  * @param params.cursor - Pagination cursor (question index to start from)
  * @param params.limit - Maximum number of questions to return
+ * @param options - Optional configuration including AbortSignal for request cancellation
  * @returns Promise resolving to paginated question list
  * @throws {ApiError} If the request fails
  *
@@ -35,13 +36,19 @@ import type {
  *
  * // Get next page using cursor
  * const nextPage = await fetchQuestions({ cursor: 20, limit: 20 });
+ *
+ * // With cancellation support
+ * const controller = new AbortController();
+ * const response = await fetchQuestions({ limit: 20 }, { signal: controller.signal });
  * ```
  */
 export async function fetchQuestions(
-  params?: QuestionQueryParams
+  params?: QuestionQueryParams,
+  options?: { signal?: AbortSignal }
 ): Promise<PaginatedResponse> {
   const response = await apiClient.get<PaginatedResponse>(ENDPOINTS.QUESTIONS, {
     params,
+    signal: options?.signal,
   });
 
   return response.data;
@@ -51,6 +58,7 @@ export async function fetchQuestions(
  * Fetch a single question by its ID
  *
  * @param id - MongoDB ObjectId string of the question
+ * @param options - Optional configuration including AbortSignal for request cancellation
  * @returns Promise resolving to the question data
  * @throws {ApiError} If the question is not found or request fails
  *
@@ -58,13 +66,19 @@ export async function fetchQuestions(
  * ```typescript
  * const question = await fetchQuestionById('507f1f77bcf86cd799439011');
  * console.log(question.data.question);
+ *
+ * // With cancellation support
+ * const controller = new AbortController();
+ * const question = await fetchQuestionById('507f1f77bcf86cd799439011', { signal: controller.signal });
  * ```
  */
 export async function fetchQuestionById(
-  id: string
+  id: string,
+  options?: { signal?: AbortSignal }
 ): Promise<QuestionResponse> {
   const response = await apiClient.get<QuestionResponse>(
-    ENDPOINTS.QUESTION_BY_ID(id)
+    ENDPOINTS.QUESTION_BY_ID(id),
+    { signal: options?.signal }
   );
 
   return response.data;
@@ -73,6 +87,7 @@ export async function fetchQuestionById(
 /**
  * Check API health status
  *
+ * @param options - Optional configuration including AbortSignal for request cancellation
  * @returns Promise resolving to health status
  * @throws {ApiError} If the health check fails
  *
@@ -81,10 +96,19 @@ export async function fetchQuestionById(
  * const health = await healthCheck();
  * console.log(health.status); // "healthy"
  * console.log(health.service); // "quizling-api"
+ *
+ * // With cancellation support
+ * const controller = new AbortController();
+ * const health = await healthCheck({ signal: controller.signal });
  * ```
  */
-export async function healthCheck(): Promise<HealthResponse> {
-  const response = await apiClient.get<HealthResponse>(ENDPOINTS.HEALTH_CHECK);
+export async function healthCheck(
+  options?: { signal?: AbortSignal }
+): Promise<HealthResponse> {
+  const response = await apiClient.get<HealthResponse>(
+    ENDPOINTS.HEALTH_CHECK,
+    { signal: options?.signal }
+  );
 
   return response.data;
 }

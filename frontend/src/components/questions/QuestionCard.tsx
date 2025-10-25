@@ -1,18 +1,14 @@
+import { memo } from 'react'
 import { Link } from 'react-router-dom'
 import Card from '../common/Card'
-import type { MultipleChoiceQuestion, DifficultyLevel } from '@/types'
+import { getDifficultyColor } from '@/utils/difficulty'
+import type { MultipleChoiceQuestion } from '@/types'
 
 export interface QuestionCardProps {
   question: MultipleChoiceQuestion
 }
 
-const difficultyColors: Record<DifficultyLevel, string> = {
-  easy: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-  medium: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-  hard: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-}
-
-export default function QuestionCard({ question }: QuestionCardProps) {
+function QuestionCard({ question }: QuestionCardProps) {
   const truncatedQuestion =
     question.question.length > 100
       ? `${question.question.slice(0, 100)}...`
@@ -29,7 +25,7 @@ export default function QuestionCard({ question }: QuestionCardProps) {
         <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <span
-              className={`inline-block px-3 py-1 rounded-full text-xs font-semibold uppercase ${difficultyColors[question.difficulty]}`}
+              className={`inline-block px-3 py-1 rounded-full text-xs font-semibold uppercase ${getDifficultyColor(question.difficulty)}`}
             >
               {question.difficulty}
             </span>
@@ -48,3 +44,5 @@ export default function QuestionCard({ question }: QuestionCardProps) {
     </Link>
   )
 }
+
+export default memo(QuestionCard)

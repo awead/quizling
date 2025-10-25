@@ -1,3 +1,4 @@
+import { useCallback } from 'react'
 import type { DifficultyLevel } from '@/types'
 
 export interface QuestionFiltersProps {
@@ -9,10 +10,10 @@ export default function QuestionFilters({
   selectedDifficulty,
   onDifficultyChange,
 }: QuestionFiltersProps) {
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value
     onDifficultyChange(value === 'all' ? null : (value as DifficultyLevel))
-  }
+  }, [onDifficultyChange])
 
   return (
     <div className="flex flex-col gap-2">

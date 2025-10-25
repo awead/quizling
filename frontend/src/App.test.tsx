@@ -7,20 +7,31 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { render, screen } from '@/test/test-utils'
+import { render, screen, waitFor } from '@/test/test-utils'
 import App from './App'
 
 describe('App Component', () => {
   describe('Routing and Navigation', () => {
-    it('should render the home page by default', () => {
+    it('should render the home page by default', async () => {
       render(<App />, { withRouter: false })
-      expect(
-        screen.getByRole('heading', { name: /Welcome to Quizling/i })
-      ).toBeInTheDocument()
+
+      // Wait for lazy-loaded component to render
+      await waitFor(() => {
+        expect(
+          screen.getByRole('heading', { name: /Welcome to Quizling/i })
+        ).toBeInTheDocument()
+      })
     })
 
-    it('should render the header with navigation', () => {
+    it('should render the header with navigation', async () => {
       render(<App />, { withRouter: false })
+
+      // Wait for lazy-loaded component to render
+      await waitFor(() => {
+        expect(
+          screen.getByRole('heading', { name: /Welcome to Quizling/i })
+        ).toBeInTheDocument()
+      })
 
       // Check that we have navigation links (they appear multiple times on the page)
       const homeLinks = screen.getAllByRole('link', { name: /^Home$/i })
@@ -32,9 +43,13 @@ describe('App Component', () => {
       expect(quizLinks.length).toBeGreaterThan(0)
     })
 
-    it('should render the footer', () => {
+    it('should render the footer', async () => {
       render(<App />, { withRouter: false })
-      expect(screen.getByText(/All rights reserved/i)).toBeInTheDocument()
+
+      // Wait for lazy-loaded component to render
+      await waitFor(() => {
+        expect(screen.getByText(/All rights reserved/i)).toBeInTheDocument()
+      })
     })
   })
 })

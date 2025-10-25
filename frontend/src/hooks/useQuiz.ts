@@ -37,6 +37,7 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import { fetchQuestions } from '@/api';
+import { ApiError } from '@/api/errors';
 import type { MultipleChoiceQuestion } from '@/types';
 
 export interface UserAnswer {
@@ -84,12 +85,12 @@ export function useQuiz(questionCount: number = 15): UseQuizReturn {
   const [isQuizStarted, setIsQuizStarted] = useState<boolean>(false);
 
   // Fetch questions when quiz starts
-  const loadQuestions = useCallback(async () => {
+  const loadQuestions = useCallback(async (signal?: AbortSignal) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const response = await fetchQuestions({ limit: questionCount });
+      const response = await fetchQuestions({ limit: questionCount }, { signal });
 
       if (response.data.length === 0) {
         setError('No questions available. Please try again later.');
@@ -99,7 +100,12 @@ export function useQuiz(questionCount: number = 15): UseQuizReturn {
       setQuestions(response.data);
       setError(null);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to load quiz questions';
+      // Handle ApiError instances from the API client
+      const errorMessage = err instanceof ApiError
+        ? err.message
+        : err instanceof Error
+        ? err.message
+        : 'Failed to load quiz questions';
       setError(errorMessage);
       setQuestions([]);
     } finally {
@@ -109,11 +115,12 @@ export function useQuiz(questionCount: number = 15): UseQuizReturn {
 
   // Start the quiz
   const startQuiz = useCallback(() => {
+    const abortController = new AbortController();
     setIsQuizStarted(true);
     setIsQuizComplete(false);
     setCurrentQuestionIndex(0);
     setUserAnswers(new Map());
-    loadQuestions();
+    loadQuestions(abortController.signal);
   }, [loadQuestions]);
 
   // Select an answer for the current question

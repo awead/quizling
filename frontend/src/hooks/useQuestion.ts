@@ -28,6 +28,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { fetchQuestionById } from '@/api';
+import { ApiError } from '@/api/errors';
 import type { MultipleChoiceQuestion } from '@/types';
 
 interface UseQuestionReturn {
@@ -52,20 +53,26 @@ export function useQuestion(id: string | undefined): UseQuestionReturn {
     }
 
     let isMounted = true;
+    const abortController = new AbortController();
 
     const fetchQuestion = async () => {
       setIsLoading(true);
       setError(null);
 
       try {
-        const response = await fetchQuestionById(id);
+        const response = await fetchQuestionById(id, { signal: abortController.signal });
         if (isMounted) {
           setQuestion(response.data);
           setError(null);
         }
       } catch (err) {
         if (isMounted) {
-          const errorMessage = err instanceof Error ? err.message : 'Failed to fetch question';
+          // Handle ApiError instances from the API client
+          const errorMessage = err instanceof ApiError
+            ? err.message
+            : err instanceof Error
+            ? err.message
+            : 'Failed to fetch question';
           setError(errorMessage);
           setQuestion(null);
         }
@@ -78,9 +85,10 @@ export function useQuestion(id: string | undefined): UseQuestionReturn {
 
     fetchQuestion();
 
-    // Cleanup function to prevent state updates on unmounted component
+    // Cleanup function to prevent state updates on unmounted component and cancel pending requests
     return () => {
       isMounted = false;
+      abortController.abort();
     };
   }, [id, refetchTrigger]);
 

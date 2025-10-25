@@ -10,12 +10,8 @@
 import axios, { AxiosError } from 'axios';
 import type { InternalAxiosRequestConfig } from 'axios';
 import type { ErrorResponse } from '@/types';
-
-export interface ApiError {
-  status?: number;
-  detail: string;
-  originalError?: unknown;
-}
+import { logger } from '@/utils/logger';
+import { ApiError } from './errors';
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
@@ -31,7 +27,7 @@ const apiClient = axios.create({
  */
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`, {
+    logger.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`, {
       params: config.params,
       data: config.data,
     });
@@ -45,7 +41,7 @@ apiClient.interceptors.request.use(
     return config;
   },
   (error) => {
-    console.error('[API Request Error]', error);
+    logger.error('[API Request Error]', error);
     return Promise.reject(error);
   }
 );
@@ -56,39 +52,38 @@ apiClient.interceptors.request.use(
  */
 apiClient.interceptors.response.use(
   (response) => {
-    console.log(`[API Response] ${response.status} ${response.config.url}`);
+    logger.log(`[API Response] ${response.status} ${response.config.url}`);
     return response;
   },
 
   (error: AxiosError<ErrorResponse>) => {
-    const apiError: ApiError = {
-      detail: 'An unexpected error occurred',
-      originalError: error,
-    };
+    let errorMessage = 'An unexpected error occurred';
+    let status: number | undefined;
 
     if (error.response) {
-      apiError.status = error.response.status;
-      apiError.detail = error.response.data?.detail || error.message;
+      status = error.response.status;
+      errorMessage = error.response.data?.detail || error.message;
 
-      console.error(
+      logger.error(
         `[API Error] ${error.response.status} ${error.config?.url}`,
         {
-          detail: apiError.detail,
+          detail: errorMessage,
           data: error.response.data,
         }
       );
     } else if (error.request) {
-      apiError.detail = 'Network error: Unable to reach the server';
-      console.error('[API Network Error]', {
+      errorMessage = 'Network error: Unable to reach the server';
+      logger.error('[API Network Error]', {
         url: error.config?.url,
         message: error.message,
       });
     } else {
-      apiError.detail = error.message;
-      console.error('[API Configuration Error]', error.message);
+      errorMessage = error.message;
+      logger.error('[API Configuration Error]', error.message);
     }
 
-    return Promise.reject(apiError);
+    // Throw an ApiError instance instead of a plain object
+    return Promise.reject(new ApiError(errorMessage, status, error));
   }
 );
 
