@@ -118,4 +118,53 @@ describe('QuestionsPage', () => {
       )
     })
   })
+
+  it('should initialize state from URL search parameters', async () => {
+    const mockQuestions = createQuestions(5)
+    const mockResponse = createPaginatedResponse({ data: mockQuestions })
+    vi.mocked(fetchQuestions).mockResolvedValue(mockResponse)
+
+    render(<QuestionsPage />, {
+      initialEntries: ['/questions?search=test&difficulty=hard&page=3'],
+    })
+
+    // Should make API call with parameters from URL
+    await waitFor(() => {
+      expect(fetchQuestions).toHaveBeenCalledWith(
+        expect.objectContaining({ 
+          search: 'test',
+          difficulty: 'hard',
+          cursor: 40 // page 3 with 20 per page = cursor 40
+        }),
+        expect.objectContaining({ signal: expect.any(AbortSignal) })
+      )
+    })
+  })
+
+  it('should handle invalid URL parameters gracefully', async () => {
+    const mockQuestions = createQuestions(5)
+    const mockResponse = createPaginatedResponse({ data: mockQuestions })
+    vi.mocked(fetchQuestions).mockResolvedValue(mockResponse)
+
+    render(<QuestionsPage />, {
+      initialEntries: ['/questions?search=test&difficulty=invalid&page=abc'],
+    })
+
+    // Should make API call with valid parameters only and defaults for invalid ones
+    await waitFor(() => {
+      expect(fetchQuestions).toHaveBeenCalledWith(
+        expect.objectContaining({ 
+          search: 'test',
+          // difficulty should be null (invalid value ignored)
+          cursor: 0 // page defaults to 1, so cursor is 0
+        }),
+        expect.objectContaining({ signal: expect.any(AbortSignal) })
+      )
+      // Ensure difficulty is not passed for invalid values
+      expect(fetchQuestions).toHaveBeenCalledWith(
+        expect.not.objectContaining({ difficulty: 'invalid' }),
+        expect.objectContaining({ signal: expect.any(AbortSignal) })
+      )
+    })
+  })
 })

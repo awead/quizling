@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useLocation } from 'react-router-dom'
 import { useQuestion } from '@/hooks/useQuestion'
 import Card from '@/components/common/Card'
 import LoadingSpinner from '@/components/common/LoadingSpinner'
@@ -9,8 +9,27 @@ import { getDifficultyColor } from '@/utils/difficulty'
 
 export default function QuestionDetailPage() {
   const { id } = useParams<{ id: string }>()
+  const location = useLocation()
   const { question, isLoading, error, refetch } = useQuestion(id)
   const [showAnswers, setShowAnswers] = useState(false)
+
+  // Preserve search parameters from the referrer URL when navigating back to questions
+  const getBackToQuestionsPath = () => {
+    const urlParams = new URLSearchParams(location.search)
+    const questionsParams = new URLSearchParams()
+    
+    // Copy relevant parameters that should be preserved
+    const search = urlParams.get('search')
+    const difficulty = urlParams.get('difficulty')
+    const page = urlParams.get('page')
+    
+    if (search) questionsParams.set('search', search)
+    if (difficulty) questionsParams.set('difficulty', difficulty)
+    if (page) questionsParams.set('page', page)
+    
+    const queryString = questionsParams.toString()
+    return queryString ? `/questions?${queryString}` : '/questions'
+  }
 
   if (isLoading) {
     return (
@@ -26,7 +45,7 @@ export default function QuestionDetailPage() {
     return (
       <div className="max-w-4xl mx-auto">
         <div className="mb-6">
-          <Link to="/questions">
+          <Link to={getBackToQuestionsPath()}>
             <Button variant="secondary">Back to Questions</Button>
           </Link>
         </div>
@@ -39,7 +58,7 @@ export default function QuestionDetailPage() {
     return (
       <div className="max-w-4xl mx-auto">
         <div className="mb-6">
-          <Link to="/questions">
+          <Link to={getBackToQuestionsPath()}>
             <Button variant="secondary">Back to Questions</Button>
           </Link>
         </div>
@@ -58,7 +77,7 @@ export default function QuestionDetailPage() {
     <div className="max-w-4xl mx-auto">
       <div className="mb-8">
         <div className="mb-4">
-          <Link to="/questions">
+          <Link to={getBackToQuestionsPath()}>
             <Button variant="secondary">Back to Questions</Button>
           </Link>
         </div>

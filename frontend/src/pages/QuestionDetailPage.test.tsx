@@ -139,4 +139,24 @@ describe('QuestionDetailPage', () => {
     expect(screen.queryByText('Paris is the capital of France.')).not.toBeInTheDocument()
     expect(screen.getByText('Show Answer')).toBeInTheDocument()
   })
+
+  it('should preserve search parameters in back to questions link', async () => {
+    const mockQuestion = createQuestion()
+    const mockResponse = createQuestionResponse({ data: mockQuestion })
+    vi.mocked(fetchQuestionById).mockResolvedValue(mockResponse)
+
+    render(
+      <Routes>
+        <Route path="/questions/:id" element={<QuestionDetailPage />} />
+      </Routes>,
+      {
+        initialEntries: ['/questions/507f1f77bcf86cd799439011?search=test&difficulty=easy&page=2'],
+      }
+    )
+
+    await waitFor(() => {
+      const backButton = screen.getByText('Back to Questions')
+      expect(backButton.closest('a')).toHaveAttribute('href', '/questions?search=test&difficulty=easy&page=2')
+    })
+  })
 })
