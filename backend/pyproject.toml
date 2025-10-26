@@ -2,7 +2,6 @@
 name = "quizling"
 version = "0.1.0"
 description = "Generate multiple choice questions from documents using Azure OpenAI"
-readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "pydantic-ai>=1.1.0",
