@@ -28,7 +28,7 @@ services:
       AZURE_OPENAI_ENDPOINT: ${AZURE_OPENAI_ENDPOINT}
       AZURE_OPENAI_KEY: ${AZURE_OPENAI_KEY}
       AZURE_OPENAI_VERSION: ${AZURE_OPENAI_VERSION:-2024-02-15-preview}
-      MONGODB_URI: "mongodb://admin:password@mongodb:27017/quizling?authSource=admin"
+      MONGODB_URI: "mongodb://${MONGO_ROOT_USERNAME:-admin}:${MONGO_ROOT_PASSWORD:-password}@mongodb:27017/${MONGO_DATABASE:-quizling}?authSource=admin"
       MONGO_DATABASE: ${MONGO_DATABASE:-quizling}
     depends_on:
       - mongodb
