@@ -1,3 +1,7 @@
+# PDK config --- local only, everything public is in docs/
+.pdk
+docs/*.json
+
 # Python-generated files
 __pycache__/
 *.py[oc]
