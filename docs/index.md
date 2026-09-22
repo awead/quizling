@@ -24,6 +24,7 @@
 - [Deployment Guide](./deployment-guide.md)
 - [API Contracts](./api-contracts.md)
 - [Data Models](./data-models.md)
+- [Coding Standards](./coding-standards.md)
 
 ## Existing Documentation
 
