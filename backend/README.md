@@ -4,7 +4,14 @@ Runs the API and generates questions from text-based content.
 
 ## Installation
 
-This project uses `uv` for package management. First, install dependencies:
+This project uses `mise` to manage runtime tools and `uv` for Python package management.
+From the repository root:
+
+```bash
+mise install
+```
+
+Then install backend dependencies:
 
 ```bash
 uv sync
@@ -12,18 +19,15 @@ uv sync
 
 ## Configuration
 
-1. Copy the example environment file:
-
-```bash
-cp .env.example .env
-```
-
-2. Edit `.env` and add your Azure OpenAI credentials:
+Environment variables are defined in root `mise.toml` under `[env]`:
 
 ```env
 AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com
-AZURE_OPENAI_API_KEY=your-api-key-here
-AZURE_OPENAI_DEPLOYMENT=gpt-4o-mini
+AZURE_OPENAI_KEY=your-api-key-here
+AZURE_OPENAI_VERSION=2024-02-15-preview
+AZURE_OPENAI_DEPLOYMENT=gpt-5-mini
+MONGO_DATABASE=quizling
+MONGODB_URI=******localhost:27017/quizling
 ```
 
 ## Usage
@@ -278,4 +282,3 @@ uv run ruff format .
 ## License
 
 MIT License
-

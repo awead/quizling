@@ -1,0 +1,20 @@
+[tools]
+python = "3.12"
+node = "24"
+uv = "latest"
+
+[env]
+AZURE_OPENAI_ENDPOINT = "https://your-resource.openai.azure.com"
+AZURE_OPENAI_KEY = "your-api-key-here"
+AZURE_OPENAI_VERSION = "2024-02-15-preview"
+AZURE_OPENAI_DEPLOYMENT = "gpt-5-mini"
+MONGO_ROOT_USERNAME = "admin"
+MONGO_ROOT_PASSWORD = "password"
+MONGO_DATABASE = "quizling"
+MONGO_PORT = "27017"
+MONGODB_URI = "mongodb://admin:password@localhost:27017/quizling?authSource=admin"
+BACKEND_PORT = "8000"
+FRONTEND_PORT = "8080"
+VITE_API_BASE_URL = "/api"
+VITE_API_TIMEOUT = "10000"
+VITE_QUESTIONS_PER_PAGE = "20"

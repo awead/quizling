@@ -101,9 +101,8 @@ These are generated but tracked — they belong in your diff, but only via the t
 
 ## Secrets
 
-- `backend/.env` (copied from `backend/.env.example`) holds `AZURE_OPENAI_ENDPOINT`,
-  `AZURE_OPENAI_KEY`, `AZURE_OPENAI_VERSION`, `AZURE_OPENAI_DEPLOYMENT`, `MONGODB_URI`, and
-  `MONGO_DATABASE` — never commit real values; `.env` is gitignored, `.env.example` is not.
-- `frontend/.env.development` and `frontend/.env.production` are tracked and non-secret
-  (`VITE_API_BASE_URL`, `VITE_API_TIMEOUT`, `VITE_QUESTIONS_PER_PAGE`) — no secrets belong in
-  the frontend build at all, since it ships to the browser.
+- Environment variable names/defaults are defined in root `mise.toml` (`[env]`), including
+  `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_KEY`, `AZURE_OPENAI_VERSION`,
+  `AZURE_OPENAI_DEPLOYMENT`, `MONGODB_URI`, and `MONGO_DATABASE`.
+- Never commit real credentials; no secrets belong in the frontend build since it ships to the
+  browser.
