@@ -21,7 +21,7 @@ and `backend` by service name.
 
 ## Environment Configuration
 
-Set via a root `.env` file (consumed by `docker-compose.yml`) or your orchestrator's secret/config mechanism:
+Set via the root `mise.toml` `[env]` block (or your orchestrator's secret/config mechanism):
 
 | Variable | Default | Used by |
 |---|---|---|
@@ -45,8 +45,7 @@ Note: the backend's Azure OpenAI variables are only exercised by the CLI generat
 
 ```bash
 # From the repo root
-cp .env.example .env   # if an env file convention is adopted; otherwise export vars directly
-docker-compose up -d --build
+mise x -- docker-compose up -d --build
 ```
 
 This builds and starts all three services. The frontend becomes available on `http://localhost:${FRONTEND_PORT:-8080}`,

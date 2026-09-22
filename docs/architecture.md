@@ -100,4 +100,5 @@ to the backend service).
 
 No authentication or authorization is implemented anywhere in the stack. The axios client (`frontend/src/api/client.ts`)
 has a commented-out placeholder for future bearer-token injection, and the API has no auth middleware or guards.
-Azure OpenAI and MongoDB credentials are supplied purely via environment variables (`.env`, Docker Compose `environment:`).
+Azure OpenAI and MongoDB credentials are supplied purely via environment variables (root `mise.toml` `[env]`,
+Docker Compose `environment:`).

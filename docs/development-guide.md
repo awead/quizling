@@ -4,21 +4,24 @@
 
 ## Prerequisites
 
-- Python >= 3.12
-- [`uv`](https://docs.astral.sh/uv/) for backend package management
-- Node.js (CI tests against 22 and 24)
+- [`mise`](https://mise.jdx.dev/) for runtime tool management (`python`, `node`, `uv`)
 - Docker + Docker Compose (for MongoDB, or for running the full stack)
 - An Azure OpenAI resource (endpoint, API key, deployment name) — required only for the question-generation CLI
+
+Install toolchain versions from the repo root:
+
+```bash
+mise install
+```
 
 ## Backend Setup
 
 ```bash
 cd backend
 uv sync                       # install dependencies (including dev group)
-cp .env.example .env          # then fill in AZURE_OPENAI_* and MongoDB values
 ```
 
-`.env` variables (see `backend/.env.example`):
+Environment variables are defined in the repository root `mise.toml` under `[env]`:
 
 ```env
 AZURE_OPENAI_ENDPOINT=your-endpoint-here
@@ -80,8 +83,8 @@ cd frontend
 npm install
 ```
 
-Environment files already present in the repo: `.env.development` / `.env.production` set
-`VITE_API_BASE_URL=/api`, `VITE_API_TIMEOUT=10000`, `VITE_QUESTIONS_PER_PAGE=20`.
+Frontend runtime settings (`VITE_API_BASE_URL`, `VITE_API_TIMEOUT`, `VITE_QUESTIONS_PER_PAGE`) are also set in
+the root `mise.toml` `[env]` block.
 
 ### Running the dev server
 

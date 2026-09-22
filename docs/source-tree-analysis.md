@@ -4,6 +4,7 @@
 
 ```
 quizling/
+├── mise.toml                   # Toolchain versions for local development (python/node/uv)
 ├── docker-compose.yml            # Orchestrates mongodb + backend + frontend services
 ├── .github/workflows/
 │   ├── test-backend.yml          # CI: pytest across Python 3.11/3.12
@@ -13,7 +14,6 @@ quizling/
 │   ├── pyproject.toml            # Deps: pydantic-ai, fastapi, pymongo, pypdf, python-docx, ruff, pytest
 │   ├── Dockerfile                # python:3.12-slim + uv, runs uvicorn
 │   ├── Makefile                  # make test / test-cov / console / api
-│   ├── .env.example              # Azure OpenAI + MongoDB env var template
 │   ├── src/quizling/
 │   │   ├── __main__.py           # Entry point: CLI question generator (python -m quizling <file>)
 │   │   ├── api/                  # FastAPI HTTP layer → Calls storage/ for persistence
