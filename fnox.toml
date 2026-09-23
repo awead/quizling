@@ -1,0 +1,9 @@
+[providers]
+azure = { type = "azure-sm", vault_url = "https://kv-aif-a8d20d36.vault.azure.net/" }
+
+[daemon]
+enabled = true
+idle_timeout = "24h"
+
+[secrets]
+AZURE_OPENAI_KEY = { provider = "azure", value = "aif-a8d20d36-primary-key" }
