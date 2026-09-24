@@ -22,13 +22,15 @@ uv sync
 Environment variables are defined in root `mise.toml` under `[env]`:
 
 ```env
-AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com
-AZURE_OPENAI_KEY=your-api-key-here
+AZURE_OPENAI_ENDPOINT=https://aif-a8d20d36.cognitiveservices.azure.com
 AZURE_OPENAI_VERSION=2024-02-15-preview
-AZURE_OPENAI_DEPLOYMENT=gpt-5-mini
+AZURE_OPENAI_DEPLOYMENT=gpt-5.5
 MONGO_DATABASE=quizling
 MONGODB_URI=******localhost:27017/quizling
 ```
+
+`AZURE_OPENAI_KEY` is deliberately absent from `mise.toml`: fnox brokers it from Key Vault
+(`fnox.toml`), so run commands that hit Azure under `fnox exec -- <cmd>`.
 
 ## Usage
 

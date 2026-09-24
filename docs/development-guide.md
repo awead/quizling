@@ -24,13 +24,15 @@ uv sync                       # install dependencies (including dev group)
 Environment variables are defined in the repository root `mise.toml` under `[env]`:
 
 ```env
-AZURE_OPENAI_ENDPOINT=your-endpoint-here
-AZURE_OPENAI_KEY=your-api-key-here
+AZURE_OPENAI_ENDPOINT=https://aif-a8d20d36.cognitiveservices.azure.com
 AZURE_OPENAI_VERSION=2024-02-15-preview
-AZURE_OPENAI_DEPLOYMENT=gpt-5-mini
+AZURE_OPENAI_DEPLOYMENT=gpt-5.5
 MONGO_DATABASE=quizling
 MONGODB_URI=mongodb://admin:password@localhost:27017/quizling
 ```
+
+`AZURE_OPENAI_KEY` is deliberately absent from `mise.toml`: fnox brokers it from Key Vault
+(`fnox.toml`), so run commands that hit Azure under `fnox exec -- <cmd>`.
 
 Note: `QuizConfig` (`backend/src/quizling/base/models.py`) reads `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_KEY`,
 `AZURE_OPENAI_DEPLOYMENT`, and `AZURE_OPENAI_VERSION` directly from `os.environ` at class-definition time — these
@@ -83,8 +85,10 @@ cd frontend
 npm install
 ```
 
-Frontend runtime settings (`VITE_API_BASE_URL`, `VITE_API_TIMEOUT`, `VITE_QUESTIONS_PER_PAGE`) are also set in
-the root `mise.toml` `[env]` block.
+Frontend settings (`VITE_API_BASE_URL`, `VITE_API_TIMEOUT`, `VITE_QUESTIONS_PER_PAGE`) are also set in
+the root `mise.toml` `[env]` block. Vite inlines them at build time: `npm run dev`/`npm run build` read them from
+the shell, and the Docker image receives them as build args from `docker-compose.yml`, so rebuild the
+`frontend` image after changing them.
 
 ### Running the dev server
 

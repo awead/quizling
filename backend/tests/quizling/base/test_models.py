@@ -1,3 +1,4 @@
+import os
 import pytest
 
 
@@ -147,7 +148,7 @@ class TestQuizConfig:
         assert config.num_questions == 5
         assert config.difficulty == DifficultyLevel.MEDIUM
         assert config.include_explanations is True
-        assert config.azure_deployment_name == "gpt-5-mini"
+        assert config.azure_deployment_name == os.environ["AZURE_OPENAI_DEPLOYMENT"]
         assert config.output_directory == "out"
 
     def test_num_questions_validation(self) -> None:

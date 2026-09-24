@@ -7,3 +7,5 @@ idle_timeout = "24h"
 
 [secrets]
 AZURE_OPENAI_KEY = { provider = "azure", value = "aif-a8d20d36-primary-key" }
+MONGO_ROOT_PASSWORD = { default = "password" }
+MONGODB_URI = { default = "mongodb://admin:password@localhost:27017/quizling?authSource=admin" }
