@@ -28,7 +28,7 @@ FastAPI backend consumed by a React single-page frontend for browsing questions 
 | Backend language/runtime | Python | >=3.12 | Managed with `uv` |
 | Backend framework | FastAPI | >=0.119 | Serves `/questions` API |
 | AI orchestration | PydanticAI | >=1.1.0 | `Agent` bound to Azure OpenAI via `OpenAIProvider` |
-| LLM provider | Azure OpenAI | (`openai` SDK, `AsyncAzureOpenAI`) | Deployment name configurable, e.g. `gpt-5-mini` |
+| LLM provider | Azure OpenAI | (`openai` SDK, `AsyncAzureOpenAI`) | Deployment name configurable, e.g. `gpt-5.5` |
 | Database | MongoDB | 7.0 (Docker image) | Accessed via `pymongo` |
 | Backend testing | pytest, pytest-asyncio, pytest-cov | | `make test`, `make test-cov` |
 | Backend lint/format | ruff | >=0.14 | |

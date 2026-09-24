@@ -9,6 +9,13 @@ RUN npm ci
 
 COPY . .
 
+# Vite inlines VITE_* values into the bundle at build time, so they must be
+# build args; runtime container env has no effect on the served app.
+ARG VITE_API_BASE_URL=/api
+ARG VITE_API_TIMEOUT=10000
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL \
+    VITE_API_TIMEOUT=$VITE_API_TIMEOUT
+
 RUN npm run build
 
 # Production stage that runs the compiled application

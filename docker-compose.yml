@@ -24,7 +24,7 @@ services:
     ports:
       - "${BACKEND_PORT:-8000}:8000"
     environment:
-      AZURE_OPENAI_DEPLOYMENT: ${AZURE_OPENAI_DEPLOYMENT:-gpt-5-mini}
+      AZURE_OPENAI_DEPLOYMENT: ${AZURE_OPENAI_DEPLOYMENT:-gpt-5.5}
       AZURE_OPENAI_ENDPOINT: ${AZURE_OPENAI_ENDPOINT}
       AZURE_OPENAI_KEY: ${AZURE_OPENAI_KEY}
       AZURE_OPENAI_VERSION: ${AZURE_OPENAI_VERSION:-2024-02-15-preview}
@@ -39,12 +39,13 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/api}
+        VITE_API_TIMEOUT: ${VITE_API_TIMEOUT:-10000}
     container_name: quizling-frontend
     restart: unless-stopped
     ports:
       - "${FRONTEND_PORT:-8080}:80"
-    environment:
-      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/api}
     depends_on:
       - backend
     networks:

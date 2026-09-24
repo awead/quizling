@@ -29,12 +29,13 @@ Set via the root `mise.toml` `[env]` block (or your orchestrator's secret/config
 | `MONGO_ROOT_PASSWORD` | `password` | mongodb, backend (connection string) |
 | `MONGO_DATABASE` | `quizling` | mongodb, backend |
 | `MONGO_PORT` | `27017` | mongodb (host port) |
-| `AZURE_OPENAI_DEPLOYMENT` | `gpt-5-mini` | backend |
+| `AZURE_OPENAI_DEPLOYMENT` | `gpt-5.5` | backend |
 | `AZURE_OPENAI_ENDPOINT` | *(required, no default)* | backend |
-| `AZURE_OPENAI_KEY` | *(required, no default)* | backend |
+| `AZURE_OPENAI_KEY` | *(required, no default; brokered by fnox)* | backend |
 | `AZURE_OPENAI_VERSION` | `2024-02-15-preview` | backend |
 | `BACKEND_PORT` | `8000` | backend (host port) |
-| `VITE_API_BASE_URL` | `/api` | frontend (build/runtime) |
+| `VITE_API_BASE_URL` | `/api` | frontend (Docker build arg; inlined at build time, rebuild to change) |
+| `VITE_API_TIMEOUT` | `10000` | frontend (Docker build arg; inlined at build time, rebuild to change) |
 | `FRONTEND_PORT` | `8080` | frontend (host port) |
 
 Note: the backend's Azure OpenAI variables are only exercised by the CLI generation path
