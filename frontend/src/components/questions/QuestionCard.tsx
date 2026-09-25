@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import Card from '../common/Card'
 import { getDifficultyColor } from '@/utils/difficulty'
 import type { MultipleChoiceQuestion } from '@/types'
@@ -9,16 +9,26 @@ export interface QuestionCardProps {
 }
 
 function QuestionCard({ question }: QuestionCardProps) {
+  const location = useLocation()
+  
   const truncatedQuestion =
     question.question.length > 100
       ? `${question.question.slice(0, 100)}...`
       : question.question
 
   const firstAnswer = question.options[0]
+  
+  // Preserve current search parameters when navigating to question detail
+  const getQuestionDetailPath = () => {
+    const queryString = location.search
+    return queryString 
+      ? `/questions/${question.id}${queryString}` 
+      : `/questions/${question.id}`
+  }
 
   return (
     <Link
-      to={`/questions/${question.id}`}
+      to={getQuestionDetailPath()}
       className="block transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded-lg"
     >
       <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer">
