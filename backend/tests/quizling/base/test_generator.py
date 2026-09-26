@@ -16,7 +16,6 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 @pytest.fixture
 def mock_config() -> QuizConfig:
-    """Create a mock configuration for testing."""
     return QuizConfig(
         num_questions=3,
         difficulty=DifficultyLevel.MEDIUM,
@@ -29,7 +28,6 @@ def mock_config() -> QuizConfig:
 
 @pytest.fixture
 def sample_questions() -> list[MultipleChoiceQuestion]:
-    """Create sample questions for testing."""
     return [
         MultipleChoiceQuestion(
             question="What is Python?",
@@ -68,10 +66,7 @@ def sample_questions() -> list[MultipleChoiceQuestion]:
 
 
 class TestQuizGenerator:
-    """Tests for QuizGenerator class."""
-
     def test_initialization(self, mock_config: QuizConfig) -> None:
-        """Test that QuizGenerator initializes correctly."""
         generator = QuizGenerator(mock_config)
         assert generator.config == mock_config
         assert generator._agent is not None
@@ -79,7 +74,6 @@ class TestQuizGenerator:
     def test_build_system_prompt_with_explanations(
         self, mock_config: QuizConfig
     ) -> None:
-        """Test system prompt generation with explanations enabled."""
         generator = QuizGenerator(mock_config)
         prompt = generator._build_system_prompt()
 
@@ -91,7 +85,6 @@ class TestQuizGenerator:
     def test_build_system_prompt_without_explanations(
         self, mock_config: QuizConfig
     ) -> None:
-        """Test system prompt generation with explanations disabled."""
         mock_config.include_explanations = False
         generator = QuizGenerator(mock_config)
         prompt = generator._build_system_prompt()
@@ -101,7 +94,6 @@ class TestQuizGenerator:
     def test_build_system_prompt_with_topic_focus(
         self, mock_config: QuizConfig
     ) -> None:
-        """Test system prompt generation with topic focus."""
         mock_config.topic_focus = "machine learning"
         generator = QuizGenerator(mock_config)
         prompt = generator._build_system_prompt()
@@ -112,7 +104,6 @@ class TestQuizGenerator:
     def test_build_system_prompt_requests_label_free_options(
         self, mock_config: QuizConfig
     ) -> None:
-        """Test that the prompt asks for is_correct options with no labels."""
         generator = QuizGenerator(mock_config)
         prompt = generator._build_system_prompt()
 
@@ -125,7 +116,6 @@ class TestQuizGenerator:
     def test_build_system_prompt_forbids_positional_explanations(
         self, mock_config: QuizConfig
     ) -> None:
-        """Test that explanations must not cite option letters or positions."""
         generator = QuizGenerator(mock_config)
         prompt = generator._build_system_prompt()
 
@@ -135,7 +125,6 @@ class TestQuizGenerator:
     async def test_generate_from_text(
         self, mock_config: QuizConfig, sample_questions: list[MultipleChoiceQuestion]
     ) -> None:
-        """Test generating questions from text."""
         generator = QuizGenerator(mock_config)
 
         mock_result = MagicMock()
@@ -157,7 +146,6 @@ class TestQuizGenerator:
 
     @pytest.mark.asyncio
     async def test_generate_from_text_too_short(self, mock_config: QuizConfig) -> None:
-        """Test that short text raises ValueError."""
         generator = QuizGenerator(mock_config)
 
         with pytest.raises(ValueError, match="too short"):
@@ -167,7 +155,6 @@ class TestQuizGenerator:
     async def test_generate_from_file(
         self, mock_config: QuizConfig, sample_questions: list[MultipleChoiceQuestion]
     ) -> None:
-        """Test generating questions from a file."""
         generator = QuizGenerator(mock_config)
 
         with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
@@ -194,7 +181,6 @@ class TestQuizGenerator:
 
     @pytest.mark.asyncio
     async def test_generate_from_file_not_found(self, mock_config: QuizConfig) -> None:
-        """Test that non-existent file raises FileNotFoundError."""
         generator = QuizGenerator(mock_config)
 
         with pytest.raises(FileNotFoundError):
@@ -204,7 +190,6 @@ class TestQuizGenerator:
     async def test_generate_from_file_unsupported_format(
         self, mock_config: QuizConfig
     ) -> None:
-        """Test that unsupported file format raises ValueError."""
         generator = QuizGenerator(mock_config)
 
         with tempfile.NamedTemporaryFile(mode="w", suffix=".xyz", delete=False) as f:
@@ -221,7 +206,6 @@ class TestQuizGenerator:
     async def test_generate_from_file_content_too_short(
         self, mock_config: QuizConfig
     ) -> None:
-        """Test that file with too little content raises ValueError."""
         generator = QuizGenerator(mock_config)
 
         with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
@@ -238,7 +222,6 @@ class TestQuizGenerator:
     async def test_generate_questions_error_handling(
         self, mock_config: QuizConfig
     ) -> None:
-        """Test error handling during question generation."""
         generator = QuizGenerator(mock_config)
 
         with patch.object(generator._agent, "run", new_callable=AsyncMock) as mock_run:

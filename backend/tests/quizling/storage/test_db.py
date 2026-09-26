@@ -1,5 +1,3 @@
-"""Tests for MongoDB storage functionality."""
-
 import pytest
 from unittest.mock import MagicMock, patch
 
@@ -10,7 +8,6 @@ from quizling.storage.db import MongoDBConnectionError
 
 @pytest.fixture
 def sample_question() -> MultipleChoiceQuestion:
-    """Create a sample question for testing."""
     return MultipleChoiceQuestion(
         question="What is 2+2?",
         options=[
@@ -26,7 +23,6 @@ def sample_question() -> MultipleChoiceQuestion:
 
 @pytest.fixture
 def sample_questions() -> list[MultipleChoiceQuestion]:
-    """Create multiple sample questions for testing."""
     return [
         MultipleChoiceQuestion(
             question="What is 2+2?",
@@ -65,10 +61,7 @@ def sample_questions() -> list[MultipleChoiceQuestion]:
 
 
 class TestMongoDBClient:
-    """Tests for MongoDBClient class."""
-
     def test_init_with_defaults(self) -> None:
-        """Test initialization with default parameters."""
         with patch("quizling.storage.db.MongoClient") as mock_client_class:
             mock_client = MagicMock()
             mock_client_class.return_value = mock_client
@@ -81,7 +74,6 @@ class TestMongoDBClient:
             mock_client_class.assert_called_once()
 
     def test_init_with_custom_params(self) -> None:
-        """Test initialization with custom parameters."""
         with patch("quizling.storage.db.MongoClient") as mock_client_class:
             mock_client = MagicMock()
             mock_client_class.return_value = mock_client
@@ -95,7 +87,6 @@ class TestMongoDBClient:
             assert client.database_name == custom_db
 
     def test_connection_error(self) -> None:
-        """Test that connection errors are handled properly."""
         with patch("quizling.storage.db.MongoClient") as mock_client_class:
             from pymongo import errors
 
@@ -107,7 +98,6 @@ class TestMongoDBClient:
                 MongoDBClient()
 
     def test_context_manager(self) -> None:
-        """Test that client can be used as context manager."""
         with patch("quizling.storage.db.MongoClient") as mock_client_class:
             mock_client = MagicMock()
             mock_client_class.return_value = mock_client
@@ -119,7 +109,6 @@ class TestMongoDBClient:
             mock_client.close.assert_called_once()
 
     def test_insert_question(self, sample_question: MultipleChoiceQuestion) -> None:
-        """Test inserting a single question."""
         with patch("quizling.storage.db.MongoClient") as mock_client_class:
             mock_client = MagicMock()
             mock_collection = MagicMock()
@@ -141,7 +130,6 @@ class TestMongoDBClient:
     def test_insert_questions(
         self, sample_questions: list[MultipleChoiceQuestion]
     ) -> None:
-        """Test inserting multiple questions."""
         with patch("quizling.storage.db.MongoClient") as mock_client_class:
             mock_client = MagicMock()
             mock_collection = MagicMock()
@@ -161,7 +149,6 @@ class TestMongoDBClient:
             mock_collection.insert_many.assert_called_once()
 
     def test_insert_questions_empty_list(self) -> None:
-        """Test inserting empty list of questions."""
         with patch("quizling.storage.db.MongoClient") as mock_client_class:
             mock_client = MagicMock()
             mock_client_class.return_value = mock_client
@@ -172,7 +159,6 @@ class TestMongoDBClient:
             assert results == []
 
     def test_get_question(self, sample_question: MultipleChoiceQuestion) -> None:
-        """Test retrieving a single question."""
         with (
             patch("quizling.storage.db.MongoClient") as mock_client_class,
             patch("bson.ObjectId") as mock_objectid,
@@ -202,7 +188,6 @@ class TestMongoDBClient:
             assert result.id == "test_id"
 
     def test_get_question_not_found(self) -> None:
-        """Test retrieving a question that doesn't exist."""
         with patch("quizling.storage.db.MongoClient") as mock_client_class:
             mock_client = MagicMock()
             mock_collection = MagicMock()
@@ -221,7 +206,6 @@ class TestMongoDBClient:
     def test_get_questions_by_difficulty(
         self, sample_questions: list[MultipleChoiceQuestion]
     ) -> None:
-        """Test retrieving questions by difficulty level."""
         with patch("quizling.storage.db.MongoClient") as mock_client_class:
             mock_client = MagicMock()
             mock_collection = MagicMock()
@@ -246,7 +230,6 @@ class TestMongoDBClient:
             mock_collection.find.assert_called_once_with({"difficulty": "easy"})
 
     def test_count_questions(self) -> None:
-        """Test counting questions in database."""
         with patch("quizling.storage.db.MongoClient") as mock_client_class:
             mock_client = MagicMock()
             mock_collection = MagicMock()
@@ -264,7 +247,6 @@ class TestMongoDBClient:
             mock_collection.count_documents.assert_called_once_with({})
 
     def test_delete_question(self) -> None:
-        """Test deleting a question."""
         with (
             patch("quizling.storage.db.MongoClient") as mock_client_class,
             patch("bson.ObjectId") as mock_objectid,
@@ -290,7 +272,6 @@ class TestMongoDBClient:
             mock_collection.delete_one.assert_called_once()
 
     def test_delete_all_questions(self) -> None:
-        """Test deleting all questions."""
         with patch("quizling.storage.db.MongoClient") as mock_client_class:
             mock_client = MagicMock()
             mock_collection = MagicMock()
@@ -310,7 +291,6 @@ class TestMongoDBClient:
             mock_collection.delete_many.assert_called_once_with({})
 
     def test_search_questions(self) -> None:
-        """Test searching questions by text."""
         with patch("quizling.storage.db.MongoClient") as mock_client_class:
             mock_client = MagicMock()
             mock_collection = MagicMock()

@@ -20,35 +20,26 @@ def _options(correct_index: int | None = 0, count: int = 4) -> list[AnswerOption
 
 
 class TestAnswerOption:
-    """Tests for AnswerOption model."""
-
     def test_valid_answer_option(self) -> None:
-        """Test creating a valid answer option."""
         option = AnswerOption(text="Answer text", is_correct=True)
         assert option.text == "Answer text"
         assert option.is_correct is True
 
     def test_option_has_only_text_and_is_correct(self) -> None:
-        """Test that a serialized option carries no label."""
         option = AnswerOption(text="Answer text", is_correct=False)
         assert option.model_dump() == {"text": "Answer text", "is_correct": False}
 
     def test_is_correct_is_required(self) -> None:
-        """Test that an old-shape option without is_correct is rejected."""
         with pytest.raises(ValidationError):
             AnswerOption.model_validate({"label": "A", "text": "Answer text"})
 
     def test_empty_text(self) -> None:
-        """Test that empty text is rejected."""
         with pytest.raises(ValidationError):
             AnswerOption(text="", is_correct=False)
 
 
 class TestMultipleChoiceQuestion:
-    """Tests for MultipleChoiceQuestion model."""
-
     def test_valid_question(self) -> None:
-        """Test creating a valid multiple choice question."""
         question = MultipleChoiceQuestion(
             question="What is 2+2?",
             options=_options(correct_index=2),
@@ -68,7 +59,6 @@ class TestMultipleChoiceQuestion:
         assert question.difficulty == DifficultyLevel.EASY
 
     def test_serialized_question_has_no_labels_or_correct_answer(self) -> None:
-        """Test that the dumped question contains no label or correct_answer."""
         question = MultipleChoiceQuestion(question="Test?", options=_options())
         data = question.model_dump()
 
@@ -77,7 +67,6 @@ class TestMultipleChoiceQuestion:
             assert set(option) == {"text", "is_correct"}
 
     def test_options_keep_given_order(self) -> None:
-        """Test that options are not reordered by validation."""
         options = [
             AnswerOption(text="Delta", is_correct=False),
             AnswerOption(text="Bravo", is_correct=True),
@@ -96,19 +85,16 @@ class TestMultipleChoiceQuestion:
 
     @pytest.mark.parametrize("count", [3, 5])
     def test_rejects_option_count_other_than_four(self, count: int) -> None:
-        """Test that fewer or more than four options are rejected."""
         with pytest.raises(ValidationError):
             MultipleChoiceQuestion(question="Test?", options=_options(count=count))
 
     def test_rejects_no_correct_option(self) -> None:
-        """Test that a question with no correct option is rejected."""
         with pytest.raises(ValidationError, match="exactly one correct option"):
             MultipleChoiceQuestion(
                 question="Test?", options=_options(correct_index=None)
             )
 
     def test_rejects_multiple_correct_options(self) -> None:
-        """Test that a question with more than one correct option is rejected."""
         options = _options()
         options[1] = AnswerOption(text="Also right", is_correct=True)
 
@@ -116,7 +102,6 @@ class TestMultipleChoiceQuestion:
             MultipleChoiceQuestion(question="Test?", options=options)
 
     def test_rejects_old_shape_document(self) -> None:
-        """Test that a labeled question with correct_answer does not validate."""
         with pytest.raises(ValidationError):
             MultipleChoiceQuestion.model_validate(
                 {
@@ -130,10 +115,7 @@ class TestMultipleChoiceQuestion:
 
 
 class TestQuizConfig:
-    """Tests for QuizConfig model."""
-
     def test_valid_config(self) -> None:
-        """Test creating a valid configuration."""
         config = QuizConfig(
             num_questions=5,
             difficulty=DifficultyLevel.MEDIUM,
@@ -151,7 +133,6 @@ class TestQuizConfig:
         assert config.azure_endpoint == "https://example.openai.azure.com"
 
     def test_default_values(self) -> None:
-        """Test that default values are set correctly."""
         config = QuizConfig(
             azure_endpoint="https://example.openai.azure.com",
             azure_api_key="test-key",
@@ -164,7 +145,6 @@ class TestQuizConfig:
         assert config.output_directory == "out"
 
     def test_num_questions_validation(self) -> None:
-        """Test that num_questions is validated."""
         with pytest.raises(ValidationError):
             QuizConfig(
                 num_questions=0,
@@ -181,10 +161,7 @@ class TestQuizConfig:
 
 
 class TestQuizResult:
-    """Tests for QuizResult model."""
-
     def test_valid_quiz_result(self) -> None:
-        """Test creating a valid quiz result."""
         config = QuizConfig(
             azure_endpoint="https://example.openai.azure.com",
             azure_api_key="test-key",

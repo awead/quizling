@@ -14,8 +14,6 @@ from quizling.base.quiz_writer import QuizWriter, QuizWriterError
 
 
 class TestQuizWriter:
-    """Integration tests for QuizWriter with actual QuizResult objects."""
-
     @pytest.fixture
     def quiz_config(self) -> QuizConfig:
         return QuizConfig(

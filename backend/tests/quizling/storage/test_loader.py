@@ -1,5 +1,3 @@
-"""Tests for question loader functionality."""
-
 import json
 from pathlib import Path
 
@@ -14,7 +12,6 @@ from quizling.storage.loader import (
 
 @pytest.fixture
 def sample_question() -> MultipleChoiceQuestion:
-    """Create a sample question for testing."""
     return MultipleChoiceQuestion(
         question="What is 2+2?",
         options=[
@@ -30,7 +27,6 @@ def sample_question() -> MultipleChoiceQuestion:
 
 @pytest.fixture
 def temp_json_file(tmp_path: Path, sample_question: MultipleChoiceQuestion) -> Path:
-    """Create a temporary JSON file with a question."""
     json_file = tmp_path / "question.json"
     with open(json_file, "w", encoding="utf-8") as f:
         json.dump(sample_question.model_dump(), f)
@@ -39,7 +35,6 @@ def temp_json_file(tmp_path: Path, sample_question: MultipleChoiceQuestion) -> P
 
 @pytest.fixture
 def temp_directory_with_questions(tmp_path: Path) -> Path:
-    """Create a temporary directory with multiple question JSON files."""
     questions = [
         MultipleChoiceQuestion(
             question="What is 2+2?",
@@ -74,12 +69,9 @@ def temp_directory_with_questions(tmp_path: Path) -> Path:
 
 
 class TestLoadQuestionFromFile:
-    """Tests for load_question_from_file function."""
-
     def test_load_valid_question(
         self, temp_json_file: Path, sample_question: MultipleChoiceQuestion
     ) -> None:
-        """Test loading a valid question from a JSON file."""
         loaded_question = load_question_from_file(temp_json_file)
 
         assert loaded_question is not None
@@ -88,14 +80,12 @@ class TestLoadQuestionFromFile:
         assert loaded_question.difficulty == sample_question.difficulty
 
     def test_load_nonexistent_file(self, tmp_path: Path) -> None:
-        """Test loading from a file that doesn't exist."""
         nonexistent_file = tmp_path / "does_not_exist.json"
         result = load_question_from_file(nonexistent_file)
 
         assert result is None
 
     def test_load_invalid_json(self, tmp_path: Path) -> None:
-        """Test loading from a file with invalid JSON."""
         invalid_file = tmp_path / "invalid.json"
         with open(invalid_file, "w", encoding="utf-8") as f:
             f.write("{ invalid json }")
@@ -105,7 +95,6 @@ class TestLoadQuestionFromFile:
         assert result is None
 
     def test_load_invalid_question_data(self, tmp_path: Path) -> None:
-        """Test loading from a file with invalid question data."""
         invalid_file = tmp_path / "invalid_question.json"
         with open(invalid_file, "w", encoding="utf-8") as f:
             json.dump({"question": "test"}, f)  # Missing required fields
@@ -116,17 +105,13 @@ class TestLoadQuestionFromFile:
 
 
 class TestLoadQuestionsFromDirectory:
-    """Tests for load_questions_from_directory function."""
-
     def test_load_multiple_questions(self, temp_directory_with_questions: Path) -> None:
-        """Test loading multiple questions from a directory."""
         questions = load_questions_from_directory(temp_directory_with_questions)
 
         assert len(questions) == 2
         assert all(isinstance(q, MultipleChoiceQuestion) for q in questions)
 
     def test_load_with_pattern(self, tmp_path: Path) -> None:
-        """Test loading questions with a specific pattern."""
         # Create files with different extensions
         question = MultipleChoiceQuestion(
             question="Test?",
@@ -153,13 +138,11 @@ class TestLoadQuestionsFromDirectory:
         assert len(questions) == 1
 
     def test_load_from_empty_directory(self, tmp_path: Path) -> None:
-        """Test loading from a directory with no JSON files."""
         questions = load_questions_from_directory(tmp_path)
 
         assert len(questions) == 0
 
     def test_load_with_invalid_files(self, tmp_path: Path) -> None:
-        """Test loading when some files are invalid."""
         # Create one valid and one invalid file
         valid_question = MultipleChoiceQuestion(
             question="Valid?",
