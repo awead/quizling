@@ -56,7 +56,7 @@ quizling/
         │   ├── questions/        #   QuestionList, QuestionCard, QuestionFilters, SearchBar, Pagination
         │   └── quiz/             #   QuizInterface (orchestrator), QuizStart, QuizQuestion, QuizProgress,
         │                         #   QuizNavigation, QuizResults, AnswerOption
-        ├── utils/                #   difficulty.ts, logger.ts
+        ├── utils/                #   difficulty.ts, logger.ts, options.ts, shuffle.ts
         └── test/                 #   setup.ts, test-utils.tsx, factories.ts (shared test fixtures)
 ```
 

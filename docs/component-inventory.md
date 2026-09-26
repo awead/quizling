@@ -9,7 +9,7 @@
 |---|---|---|
 | `HomePage` | `/` | Landing page |
 | `QuestionsPage` | `/questions` | Browse/search/filter all questions, paginated |
-| `QuestionDetailPage` | `/questions/:id` | Single question detail, answers hidden by default with a toggle |
+| `QuestionDetailPage` | `/questions/:id` | Single question detail in stored option order, lettered A–D by position; answers hidden by default with a toggle |
 | `QuizPage` | `/quiz` | Hosts `QuizInterface` for an interactive 15-question quiz |
 | `NotFoundPage` | `*` | 404 fallback |
 
@@ -44,12 +44,15 @@
 
 ## Quiz Flow Components (`components/quiz/`)
 
-Orchestrated by `QuizInterface`, which renders one of the following depending on `useQuiz` state:
+Orchestrated by `QuizInterface`, which renders one of the following depending on `useQuiz` state. `useQuiz`
+shuffles each question's options once when a new quiz starts (`utils/shuffle.ts`); the order then stays fixed for
+that quiz. Letters come from on-screen position (`utils/options.ts` `optionLetter`), and an answer is recorded as
+the selected option's index and graded by that option's `is_correct`.
 
 | Component | State it renders for |
 |---|---|
 | `QuizStart` | Not started — shows a start button and question count |
-| `QuizQuestion` | In progress — current question + `AnswerOption`s, wired to `selectAnswer` |
+| `QuizQuestion` | In progress — current question + `AnswerOption`s lettered top to bottom, wired to `selectAnswer(optionIndex)` |
 | `AnswerOption` | A single selectable answer within `QuizQuestion` |
 | `QuizProgress` | In progress — progress bar (`currentQuestion` / `totalQuestions`) |
 | `QuizNavigation` | In progress — previous/next/submit controls, tracks `answeredCount` |

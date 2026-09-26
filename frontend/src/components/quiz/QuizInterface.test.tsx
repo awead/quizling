@@ -93,10 +93,10 @@ describe('QuizInterface', () => {
   it('should allow answer selection', async () => {
     const mockQuestions = createQuestions(3);
     mockQuestions[0].options = [
-      { label: 'A', text: 'Answer A' },
-      { label: 'B', text: 'Answer B' },
-      { label: 'C', text: 'Answer C' },
-      { label: 'D', text: 'Answer D' },
+      { text: 'Answer A', is_correct: true },
+      { text: 'Answer B', is_correct: false },
+      { text: 'Answer C', is_correct: false },
+      { text: 'Answer D', is_correct: false },
     ];
     const mockResponse = createPaginatedResponse({
       data: mockQuestions,
@@ -190,7 +190,6 @@ describe('QuizInterface', () => {
 
   it('should show results after submitting quiz', async () => {
     const mockQuestions = createQuestions(2);
-    mockQuestions[0].correct_answer = 'A';
     const mockResponse = createPaginatedResponse({
       data: mockQuestions,
       total: 2,

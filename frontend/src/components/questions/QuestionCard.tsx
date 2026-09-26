@@ -2,6 +2,7 @@ import { memo } from 'react'
 import { Link } from 'react-router-dom'
 import Card from '../common/Card'
 import { getDifficultyColor } from '@/utils/difficulty'
+import { optionLetter } from '@/utils/options'
 import type { MultipleChoiceQuestion } from '@/types'
 
 export interface QuestionCardProps {
@@ -36,7 +37,7 @@ function QuestionCard({ question }: QuestionCardProps) {
           </h3>
 
           <div className="text-sm text-gray-600 dark:text-gray-400">
-            <span className="font-medium">{firstAnswer.label}:</span>{' '}
+            <span className="font-medium">{optionLetter(0)}:</span>{' '}
             {firstAnswer.text}
           </div>
         </div>

@@ -45,7 +45,7 @@ Dependency injection is done via FastAPI `Depends`: `get_db()` yields a `MongoDB
   `QuizResults`, orchestrated by `QuizInterface`).
 - `hooks/` — encapsulate state + data fetching: `useQuestions` (list w/ filters, pagination, abort-on-unmount),
   `useQuestion` (single question), `useQuiz` (quiz session state machine: not-started → in-progress → complete,
-  answer tracking via a `Map<questionId, UserAnswer>`, scoring), `useDebounce`, `useFocusOnMount`.
+  per-quiz option shuffling, answer tracking via a `Map<questionId, UserAnswer>`, scoring), `useDebounce`, `useFocusOnMount`.
 - `api/` — `client.ts` (axios instance with request/response interceptors, env-driven `baseURL`/timeout, wraps
   errors in a custom `ApiError`), `endpoints.ts` (route constants), `questions.ts` (`fetchQuestions`,
   `fetchQuestionById`, `healthCheck`), `errors.ts`.

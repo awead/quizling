@@ -94,8 +94,7 @@ export default function QuizResults({
       {/* Question review */}
       <div className="space-y-6">
         {questions.map((question, index) => {
-          const userAnswer = userAnswers.get(question.id);
-          const selectedAnswer = userAnswer?.selectedAnswer || null;
+          const selectedOptionIndex = userAnswers.get(question.id)?.selectedOptionIndex ?? null;
 
           return (
             <Card key={question.id}>
@@ -103,12 +102,12 @@ export default function QuizResults({
                 question={question}
                 questionNumber={index + 1}
                 totalQuestions={totalQuestions}
-                selectedAnswer={selectedAnswer}
+                selectedOptionIndex={selectedOptionIndex}
                 onAnswerSelect={() => {}}
                 showResults={true}
               />
               {/* Show if no answer was selected */}
-              {!selectedAnswer && (
+              {selectedOptionIndex === null && (
                 <div className="mt-4 bg-gray-100 dark:bg-gray-700 border-l-4 border-gray-500 dark:border-gray-400 p-3 rounded-r-lg">
                   <p className="text-sm text-gray-700 dark:text-gray-300">
                     You did not answer this question.

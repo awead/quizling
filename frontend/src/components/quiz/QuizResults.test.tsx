@@ -17,7 +17,7 @@ describe('QuizResults', () => {
     for (let i = 0; i < 7; i++) {
       userAnswers.set(mockQuestions[i].id, {
         questionId: mockQuestions[i].id,
-        selectedAnswer: 'A',
+        selectedOptionIndex: 1,
         isCorrect: true,
       });
     }
@@ -25,7 +25,7 @@ describe('QuizResults', () => {
     for (let i = 7; i < 10; i++) {
       userAnswers.set(mockQuestions[i].id, {
         questionId: mockQuestions[i].id,
-        selectedAnswer: 'B',
+        selectedOptionIndex: 0,
         isCorrect: false,
       });
     }
@@ -52,7 +52,7 @@ describe('QuizResults', () => {
     for (let i = 0; i < 9; i++) {
       userAnswers.set(mockQuestions[i].id, {
         questionId: mockQuestions[i].id,
-        selectedAnswer: 'A',
+        selectedOptionIndex: 1,
         isCorrect: true,
       });
     }
@@ -79,7 +79,7 @@ describe('QuizResults', () => {
     for (let i = 0; i < 7; i++) {
       userAnswers.set(mockQuestions[i].id, {
         questionId: mockQuestions[i].id,
-        selectedAnswer: 'A',
+        selectedOptionIndex: 1,
         isCorrect: true,
       });
     }
@@ -105,7 +105,7 @@ describe('QuizResults', () => {
     for (let i = 0; i < 5; i++) {
       userAnswers.set(mockQuestions[i].id, {
         questionId: mockQuestions[i].id,
-        selectedAnswer: 'A',
+        selectedOptionIndex: 1,
         isCorrect: true,
       });
     }
@@ -131,7 +131,7 @@ describe('QuizResults', () => {
     for (let i = 0; i < 3; i++) {
       userAnswers.set(mockQuestions[i].id, {
         questionId: mockQuestions[i].id,
-        selectedAnswer: 'A',
+        selectedOptionIndex: 1,
         isCorrect: true,
       });
     }
@@ -149,6 +149,25 @@ describe('QuizResults', () => {
     );
 
     expect(screen.getByText('Keep Learning')).toBeInTheDocument();
+  });
+
+  it('should treat a selection of the first option as answered', () => {
+    const [question] = mockQuestions;
+    const userAnswers = new Map<string, UserAnswer>([
+      [question.id, { questionId: question.id, selectedOptionIndex: 0, isCorrect: false }],
+    ]);
+
+    render(
+      <QuizResults
+        score={0}
+        totalQuestions={1}
+        questions={[question]}
+        userAnswers={userAnswers}
+        onRetake={vi.fn()}
+      />
+    );
+
+    expect(screen.queryByText('You did not answer this question.')).not.toBeInTheDocument();
   });
 
   it('should call onRetake when retake button is clicked', () => {
@@ -199,7 +218,7 @@ describe('QuizResults', () => {
     for (let i = 0; i < 5; i++) {
       userAnswers.set(mockQuestions[i].id, {
         questionId: mockQuestions[i].id,
-        selectedAnswer: 'A',
+        selectedOptionIndex: 1,
         isCorrect: true,
       });
     }

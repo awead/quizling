@@ -3,7 +3,7 @@ import type { ButtonHTMLAttributes } from 'react';
 import { CheckIcon, XIcon } from '@/components/common/icons';
 
 export interface AnswerOptionProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  label: 'A' | 'B' | 'C' | 'D';
+  label: string;
   text: string;
   isSelected: boolean;
   isCorrect?: boolean;

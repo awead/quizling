@@ -63,6 +63,28 @@ describe('QuestionDetailPage', () => {
     expect(screen.getByText('Show Answer')).toBeInTheDocument()
   })
 
+  it('shows options in stored order lettered top to bottom', async () => {
+    vi.mocked(fetchQuestionById).mockResolvedValue(createQuestionResponse())
+
+    render(
+      <Routes>
+        <Route path="/questions/:id" element={<QuestionDetailPage />} />
+      </Routes>,
+      {
+        initialEntries: ['/questions/507f1f77bcf86cd799439011'],
+      }
+    )
+
+    await waitFor(() => {
+      expect(screen.getByText('London')).toBeInTheDocument()
+    })
+
+    const optionRows = ['London', 'Paris', 'Berlin', 'Madrid'].map(
+      (text) => screen.getByText(text).closest('.flex')?.textContent
+    )
+    expect(optionRows).toEqual(['ALondon', 'BParis', 'CBerlin', 'DMadrid'])
+  })
+
   it('should show back button', async () => {
     const mockQuestion = createQuestion()
     const mockResponse = createQuestionResponse({ data: mockQuestion })
@@ -107,7 +129,6 @@ describe('QuestionDetailPage', () => {
   it('shows or hides answers as needed', async () => {
     const mockQuestion = createQuestion({
       question: 'What is the capital of France?',
-      correct_answer: 'A',
       explanation: 'Paris is the capital of France.',
     })
     const mockResponse = createQuestionResponse({ data: mockQuestion })
@@ -129,7 +150,8 @@ describe('QuestionDetailPage', () => {
     const showAnswerButton = screen.getByText('Show Answer')
     await userEvent.click(showAnswerButton)
 
-    expect(screen.getByText('Correct Answer')).toBeInTheDocument()
+    expect(screen.getByText('Paris').parentElement).toHaveTextContent('ParisCorrect Answer')
+    expect(screen.getAllByText('Correct Answer')).toHaveLength(1)
     expect(screen.getByText('Paris is the capital of France.')).toBeInTheDocument()
 
     const hideAnswerButton = screen.getByText('Hide Answer')
