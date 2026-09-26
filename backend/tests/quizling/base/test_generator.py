@@ -109,6 +109,28 @@ class TestQuizGenerator:
         assert "machine learning" in prompt
         assert "Focus specifically on topics related to" in prompt
 
+    def test_build_system_prompt_requests_label_free_options(
+        self, mock_config: QuizConfig
+    ) -> None:
+        """Test that the prompt asks for is_correct options with no labels."""
+        generator = QuizGenerator(mock_config)
+        prompt = generator._build_system_prompt()
+
+        assert "is_correct" in prompt
+        assert "exactly one" in prompt
+        assert "(A, B, C, D)" not in prompt
+        assert "label" not in prompt
+        assert "correct_answer" not in prompt
+
+    def test_build_system_prompt_forbids_positional_explanations(
+        self, mock_config: QuizConfig
+    ) -> None:
+        """Test that explanations must not cite option letters or positions."""
+        generator = QuizGenerator(mock_config)
+        prompt = generator._build_system_prompt()
+
+        assert "Never refer to an option by letter or position" in prompt
+
     @pytest.mark.asyncio
     async def test_generate_from_text(
         self, mock_config: QuizConfig, sample_questions: list[MultipleChoiceQuestion]

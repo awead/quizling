@@ -60,17 +60,21 @@ class QuizGenerator:
 
             Requirements:
             - Generate exactly {self.config.num_questions} multiple choice questions
-            - Each question must have exactly 4 answer options (A, B, C, D)
+            - Each question must have exactly 4 answer options, exactly one of them correct
             - Questions should be at {self.config.difficulty.value} difficulty level
             - Ensure questions test understanding, not just memorization
             - Make incorrect options plausible but clearly wrong
             - {explanation_instruction}
             - {topic_instruction}
+            - Options are shuffled and lettered when shown, so their order and
+              letters are not fixed. Never refer to an option by letter or position
+              (e.g. "B is correct", "the first option") in the question, options,
+              or explanation; refer to an option by its content instead.
 
             Format each question as a JSON object with:
             - question: Clear, specific question text
-            - options: Array of 4 objects with label (A/B/C/D) and text
-            - correct_answer: The label of the correct option (A/B/C/D)
+            - options: Array of 4 objects, each with text and is_correct (true for
+              exactly one option, false for the others)
             - explanation: Why the correct answer is right (if requested)
             - difficulty: The difficulty level of the question
 
