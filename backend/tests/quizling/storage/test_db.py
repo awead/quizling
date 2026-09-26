@@ -14,12 +14,11 @@ def sample_question() -> MultipleChoiceQuestion:
     return MultipleChoiceQuestion(
         question="What is 2+2?",
         options=[
-            AnswerOption(label="A", text="3"),
-            AnswerOption(label="B", text="4"),
-            AnswerOption(label="C", text="5"),
-            AnswerOption(label="D", text="6"),
+            AnswerOption(text="3", is_correct=False),
+            AnswerOption(text="4", is_correct=True),
+            AnswerOption(text="5", is_correct=False),
+            AnswerOption(text="6", is_correct=False),
         ],
-        correct_answer="B",
         explanation="2+2=4",
         difficulty=DifficultyLevel.EASY,
     )
@@ -32,36 +31,33 @@ def sample_questions() -> list[MultipleChoiceQuestion]:
         MultipleChoiceQuestion(
             question="What is 2+2?",
             options=[
-                AnswerOption(label="A", text="3"),
-                AnswerOption(label="B", text="4"),
-                AnswerOption(label="C", text="5"),
-                AnswerOption(label="D", text="6"),
+                AnswerOption(text="3", is_correct=False),
+                AnswerOption(text="4", is_correct=True),
+                AnswerOption(text="5", is_correct=False),
+                AnswerOption(text="6", is_correct=False),
             ],
-            correct_answer="B",
             explanation="2+2=4",
             difficulty=DifficultyLevel.EASY,
         ),
         MultipleChoiceQuestion(
             question="What is the capital of France?",
             options=[
-                AnswerOption(label="A", text="London"),
-                AnswerOption(label="B", text="Paris"),
-                AnswerOption(label="C", text="Berlin"),
-                AnswerOption(label="D", text="Madrid"),
+                AnswerOption(text="London", is_correct=False),
+                AnswerOption(text="Paris", is_correct=True),
+                AnswerOption(text="Berlin", is_correct=False),
+                AnswerOption(text="Madrid", is_correct=False),
             ],
-            correct_answer="B",
             explanation="Paris is the capital of France",
             difficulty=DifficultyLevel.MEDIUM,
         ),
         MultipleChoiceQuestion(
             question="What is quantum entanglement?",
             options=[
-                AnswerOption(label="A", text="A physical phenomenon"),
-                AnswerOption(label="B", text="A type of energy"),
-                AnswerOption(label="C", text="A chemical reaction"),
-                AnswerOption(label="D", text="A biological process"),
+                AnswerOption(text="A physical phenomenon", is_correct=True),
+                AnswerOption(text="A type of energy", is_correct=False),
+                AnswerOption(text="A chemical reaction", is_correct=False),
+                AnswerOption(text="A biological process", is_correct=False),
             ],
-            correct_answer="A",
             explanation="Quantum entanglement is a physical phenomenon",
             difficulty=DifficultyLevel.HARD,
         ),
@@ -202,7 +198,7 @@ class TestMongoDBClient:
 
             assert result is not None
             assert result.question == sample_question.question
-            assert result.correct_answer == sample_question.correct_answer
+            assert result.options == sample_question.options
             assert result.id == "test_id"
 
     def test_get_question_not_found(self) -> None:

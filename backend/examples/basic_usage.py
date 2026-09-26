@@ -54,8 +54,8 @@ async def main() -> None:
         print(f"Difficulty: {question.difficulty.value}")
         print("\nOptions:")
         for option in question.options:
-            marker = "✓" if option.label == question.correct_answer else " "
-            print(f"  [{marker}] {option.label}. {option.text}")
+            marker = "✓" if option.is_correct else " "
+            print(f"  [{marker}] {option.text}")
 
         if question.explanation:
             print(f"\nExplanation: {question.explanation}")

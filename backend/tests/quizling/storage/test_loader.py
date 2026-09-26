@@ -18,12 +18,11 @@ def sample_question() -> MultipleChoiceQuestion:
     return MultipleChoiceQuestion(
         question="What is 2+2?",
         options=[
-            AnswerOption(label="A", text="3"),
-            AnswerOption(label="B", text="4"),
-            AnswerOption(label="C", text="5"),
-            AnswerOption(label="D", text="6"),
+            AnswerOption(text="3", is_correct=False),
+            AnswerOption(text="4", is_correct=True),
+            AnswerOption(text="5", is_correct=False),
+            AnswerOption(text="6", is_correct=False),
         ],
-        correct_answer="B",
         explanation="2+2=4",
         difficulty=DifficultyLevel.EASY,
     )
@@ -45,24 +44,22 @@ def temp_directory_with_questions(tmp_path: Path) -> Path:
         MultipleChoiceQuestion(
             question="What is 2+2?",
             options=[
-                AnswerOption(label="A", text="3"),
-                AnswerOption(label="B", text="4"),
-                AnswerOption(label="C", text="5"),
-                AnswerOption(label="D", text="6"),
+                AnswerOption(text="3", is_correct=False),
+                AnswerOption(text="4", is_correct=True),
+                AnswerOption(text="5", is_correct=False),
+                AnswerOption(text="6", is_correct=False),
             ],
-            correct_answer="B",
             explanation="2+2=4",
             difficulty=DifficultyLevel.EASY,
         ),
         MultipleChoiceQuestion(
             question="What is the capital of France?",
             options=[
-                AnswerOption(label="A", text="London"),
-                AnswerOption(label="B", text="Paris"),
-                AnswerOption(label="C", text="Berlin"),
-                AnswerOption(label="D", text="Madrid"),
+                AnswerOption(text="London", is_correct=False),
+                AnswerOption(text="Paris", is_correct=True),
+                AnswerOption(text="Berlin", is_correct=False),
+                AnswerOption(text="Madrid", is_correct=False),
             ],
-            correct_answer="B",
             explanation="Paris is the capital of France",
             difficulty=DifficultyLevel.MEDIUM,
         ),
@@ -87,7 +84,7 @@ class TestLoadQuestionFromFile:
 
         assert loaded_question is not None
         assert loaded_question.question == sample_question.question
-        assert loaded_question.correct_answer == sample_question.correct_answer
+        assert loaded_question.options == sample_question.options
         assert loaded_question.difficulty == sample_question.difficulty
 
     def test_load_nonexistent_file(self, tmp_path: Path) -> None:
@@ -134,12 +131,11 @@ class TestLoadQuestionsFromDirectory:
         question = MultipleChoiceQuestion(
             question="Test?",
             options=[
-                AnswerOption(label="A", text="1"),
-                AnswerOption(label="B", text="2"),
-                AnswerOption(label="C", text="3"),
-                AnswerOption(label="D", text="4"),
+                AnswerOption(text="1", is_correct=True),
+                AnswerOption(text="2", is_correct=False),
+                AnswerOption(text="3", is_correct=False),
+                AnswerOption(text="4", is_correct=False),
             ],
-            correct_answer="A",
             explanation="Test",
             difficulty=DifficultyLevel.EASY,
         )
@@ -168,12 +164,11 @@ class TestLoadQuestionsFromDirectory:
         valid_question = MultipleChoiceQuestion(
             question="Valid?",
             options=[
-                AnswerOption(label="A", text="1"),
-                AnswerOption(label="B", text="2"),
-                AnswerOption(label="C", text="3"),
-                AnswerOption(label="D", text="4"),
+                AnswerOption(text="1", is_correct=True),
+                AnswerOption(text="2", is_correct=False),
+                AnswerOption(text="3", is_correct=False),
+                AnswerOption(text="4", is_correct=False),
             ],
-            correct_answer="A",
             explanation="Valid",
             difficulty=DifficultyLevel.EASY,
         )

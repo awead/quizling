@@ -19,36 +19,33 @@ def sample_questions() -> list[MultipleChoiceQuestion]:
         MultipleChoiceQuestion(
             question="What is 2+2?",
             options=[
-                AnswerOption(label="A", text="3"),
-                AnswerOption(label="B", text="4"),
-                AnswerOption(label="C", text="5"),
-                AnswerOption(label="D", text="6"),
+                AnswerOption(text="3", is_correct=False),
+                AnswerOption(text="4", is_correct=True),
+                AnswerOption(text="5", is_correct=False),
+                AnswerOption(text="6", is_correct=False),
             ],
-            correct_answer="B",
             explanation="2+2=4",
             difficulty=DifficultyLevel.EASY,
         ),
         MultipleChoiceQuestion(
             question="What is the capital of France?",
             options=[
-                AnswerOption(label="A", text="London"),
-                AnswerOption(label="B", text="Paris"),
-                AnswerOption(label="C", text="Berlin"),
-                AnswerOption(label="D", text="Madrid"),
+                AnswerOption(text="London", is_correct=False),
+                AnswerOption(text="Paris", is_correct=True),
+                AnswerOption(text="Berlin", is_correct=False),
+                AnswerOption(text="Madrid", is_correct=False),
             ],
-            correct_answer="B",
             explanation="Paris is the capital of France",
             difficulty=DifficultyLevel.MEDIUM,
         ),
         MultipleChoiceQuestion(
             question="What is the speed of light?",
             options=[
-                AnswerOption(label="A", text="299,792,458 m/s"),
-                AnswerOption(label="B", text="300,000,000 m/s"),
-                AnswerOption(label="C", text="150,000,000 m/s"),
-                AnswerOption(label="D", text="500,000,000 m/s"),
+                AnswerOption(text="299,792,458 m/s", is_correct=True),
+                AnswerOption(text="300,000,000 m/s", is_correct=False),
+                AnswerOption(text="150,000,000 m/s", is_correct=False),
+                AnswerOption(text="500,000,000 m/s", is_correct=False),
             ],
-            correct_answer="A",
             explanation="The speed of light in vacuum is exactly 299,792,458 m/s",
             difficulty=DifficultyLevel.HARD,
         ),
@@ -224,6 +221,25 @@ class TestGetQuestionById:
 
         data = response.json()
         assert data["data"]["question"] == "What is 2+2?"
+
+    def test_get_question_serves_label_free_options(
+        self,
+        client: TestClient,
+        mock_db: MagicMock,
+        sample_questions: list[MultipleChoiceQuestion],
+    ) -> None:
+        """Test that served options carry only text and is_correct."""
+        mock_db.get_question.return_value = sample_questions[0]
+
+        data = client.get("/questions/507f1f77bcf86cd799439011").json()["data"]
+
+        assert "correct_answer" not in data
+        assert data["options"] == [
+            {"text": "3", "is_correct": False},
+            {"text": "4", "is_correct": True},
+            {"text": "5", "is_correct": False},
+            {"text": "6", "is_correct": False},
+        ]
 
     def test_get_question_not_found(
         self, client: TestClient, mock_db: MagicMock

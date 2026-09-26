@@ -34,36 +34,33 @@ class TestQuizWriter:
             MultipleChoiceQuestion(
                 question="What is the capital of France?",
                 options=[
-                    AnswerOption(label="A", text="London"),
-                    AnswerOption(label="B", text="Paris"),
-                    AnswerOption(label="C", text="Berlin"),
-                    AnswerOption(label="D", text="Madrid"),
+                    AnswerOption(text="London", is_correct=False),
+                    AnswerOption(text="Paris", is_correct=True),
+                    AnswerOption(text="Berlin", is_correct=False),
+                    AnswerOption(text="Madrid", is_correct=False),
                 ],
-                correct_answer="B",
                 explanation="Paris is the capital and largest city of France.",
                 difficulty=DifficultyLevel.EASY,
             ),
             MultipleChoiceQuestion(
                 question="What is 2 + 2?",
                 options=[
-                    AnswerOption(label="A", text="3"),
-                    AnswerOption(label="B", text="4"),
-                    AnswerOption(label="C", text="5"),
-                    AnswerOption(label="D", text="6"),
+                    AnswerOption(text="3", is_correct=False),
+                    AnswerOption(text="4", is_correct=True),
+                    AnswerOption(text="5", is_correct=False),
+                    AnswerOption(text="6", is_correct=False),
                 ],
-                correct_answer="B",
                 explanation="Basic addition: 2 + 2 = 4",
                 difficulty=DifficultyLevel.EASY,
             ),
             MultipleChoiceQuestion(
                 question="What is the speed of light?",
                 options=[
-                    AnswerOption(label="A", text="299,792,458 m/s"),
-                    AnswerOption(label="B", text="300,000,000 m/s"),
-                    AnswerOption(label="C", text="299,792 km/s"),
-                    AnswerOption(label="D", text="186,282 mi/s"),
+                    AnswerOption(text="299,792,458 m/s", is_correct=True),
+                    AnswerOption(text="300,000,000 m/s", is_correct=False),
+                    AnswerOption(text="299,792 km/s", is_correct=False),
+                    AnswerOption(text="186,282 mi/s", is_correct=False),
                 ],
-                correct_answer="A",
                 explanation="The speed of light in vacuum is exactly 299,792,458 meters per second.",
                 difficulty=DifficultyLevel.HARD,
             ),
@@ -110,7 +107,10 @@ class TestQuizWriter:
                 assert isinstance(data, dict)
                 assert "question" in data
                 assert "options" in data
-                assert "correct_answer" in data
+                assert all(
+                    set(option) == {"text", "is_correct"} for option in data["options"]
+                )
+                assert "correct_answer" not in data
 
     def test_write_preserves_question_data(
         self, quiz_result: QuizResult, temp_dir: Path
@@ -191,12 +191,11 @@ class TestQuizWriter:
         question_with_utf8 = MultipleChoiceQuestion(
             question="¿Cuál es la capital de España?",
             options=[
-                AnswerOption(label="A", text="Barcelona"),
-                AnswerOption(label="B", text="Madrid"),
-                AnswerOption(label="C", text="Valencia"),
-                AnswerOption(label="D", text="Sevilla"),
+                AnswerOption(text="Barcelona", is_correct=False),
+                AnswerOption(text="Madrid", is_correct=True),
+                AnswerOption(text="Valencia", is_correct=False),
+                AnswerOption(text="Sevilla", is_correct=False),
             ],
-            correct_answer="B",
             explanation="Madrid es la capital de España 🇪🇸",
             difficulty=DifficultyLevel.EASY,
         )
