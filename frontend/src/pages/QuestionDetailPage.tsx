@@ -6,6 +6,7 @@ import LoadingSpinner from '@/components/common/LoadingSpinner'
 import ErrorMessage from '@/components/common/ErrorMessage'
 import Button from '@/components/common/Button'
 import { getDifficultyColor } from '@/utils/difficulty'
+import { optionLetter } from '@/utils/options'
 
 export default function QuestionDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -102,11 +103,11 @@ export default function QuestionDetailPage() {
               </Button>
             </div>
             <div className="space-y-3">
-              {question.options.map((option) => {
-                const shouldHighlight = showAnswers && (option.label === question.correct_answer)
+              {question.options.map((option, index) => {
+                const shouldHighlight = showAnswers && option.is_correct
                 return (
                   <div
-                    key={option.label}
+                    key={index}
                     className={`p-4 rounded-lg border-2 transition-colors ${
                       shouldHighlight
                         ? 'bg-green-50 dark:bg-green-900/20 border-green-500 dark:border-green-600'
@@ -121,7 +122,7 @@ export default function QuestionDetailPage() {
                             : 'bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200'
                         }`}
                       >
-                        {option.label}
+                        {optionLetter(index)}
                       </span>
                       <div className="flex-1">
                         <p

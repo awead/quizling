@@ -12,116 +12,110 @@ from quizling.base.models import (
 )
 
 
+def _options(correct_index: int | None = 0, count: int = 4) -> list[AnswerOption]:
+    return [
+        AnswerOption(text=f"Option {i}", is_correct=i == correct_index)
+        for i in range(count)
+    ]
+
+
 class TestAnswerOption:
-    """Tests for AnswerOption model."""
-
     def test_valid_answer_option(self) -> None:
-        """Test creating a valid answer option."""
-        option = AnswerOption(label="A", text="Answer text")
-        assert option.label == "A"
+        option = AnswerOption(text="Answer text", is_correct=True)
         assert option.text == "Answer text"
+        assert option.is_correct is True
 
-    def test_invalid_label(self) -> None:
-        """Test that invalid labels are rejected."""
+    def test_option_has_only_text_and_is_correct(self) -> None:
+        option = AnswerOption(text="Answer text", is_correct=False)
+        assert option.model_dump() == {"text": "Answer text", "is_correct": False}
+
+    def test_is_correct_is_required(self) -> None:
         with pytest.raises(ValidationError):
-            AnswerOption(label="E", text="Answer text")
+            AnswerOption.model_validate({"label": "A", "text": "Answer text"})
 
     def test_empty_text(self) -> None:
-        """Test that empty text is rejected."""
         with pytest.raises(ValidationError):
-            AnswerOption(label="A", text="")
+            AnswerOption(text="", is_correct=False)
 
 
 class TestMultipleChoiceQuestion:
-    """Tests for MultipleChoiceQuestion model."""
-
     def test_valid_question(self) -> None:
-        """Test creating a valid multiple choice question."""
-        options = [
-            AnswerOption(label="A", text="Option A"),
-            AnswerOption(label="B", text="Option B"),
-            AnswerOption(label="C", text="Option C"),
-            AnswerOption(label="D", text="Option D"),
-        ]
-
         question = MultipleChoiceQuestion(
             question="What is 2+2?",
-            options=options,
-            correct_answer="A",
+            options=_options(correct_index=2),
             explanation="2+2 equals 4",
             difficulty=DifficultyLevel.EASY,
         )
 
         assert question.question == "What is 2+2?"
         assert len(question.options) == 4
-        assert question.correct_answer == "A"
+        assert [opt.is_correct for opt in question.options] == [
+            False,
+            False,
+            True,
+            False,
+        ]
         assert question.explanation == "2+2 equals 4"
         assert question.difficulty == DifficultyLevel.EASY
 
-    def test_options_are_sorted_by_label(self) -> None:
-        """Test that options are automatically sorted by label."""
+    def test_serialized_question_has_no_labels_or_correct_answer(self) -> None:
+        question = MultipleChoiceQuestion(question="Test?", options=_options())
+        data = question.model_dump()
+
+        assert "correct_answer" not in data
+        for option in data["options"]:
+            assert set(option) == {"text", "is_correct"}
+
+    def test_options_keep_given_order(self) -> None:
         options = [
-            AnswerOption(label="D", text="Option D"),
-            AnswerOption(label="B", text="Option B"),
-            AnswerOption(label="A", text="Option A"),
-            AnswerOption(label="C", text="Option C"),
+            AnswerOption(text="Delta", is_correct=False),
+            AnswerOption(text="Bravo", is_correct=True),
+            AnswerOption(text="Alpha", is_correct=False),
+            AnswerOption(text="Charlie", is_correct=False),
         ]
 
-        question = MultipleChoiceQuestion(
-            question="Test?",
-            options=options,
-            correct_answer="A",
-        )
+        question = MultipleChoiceQuestion(question="Test?", options=options)
 
-        labels = [opt.label for opt in question.options]
-        assert labels == ["A", "B", "C", "D"]
+        assert [opt.text for opt in question.options] == [
+            "Delta",
+            "Bravo",
+            "Alpha",
+            "Charlie",
+        ]
 
-    def test_invalid_number_of_options(self) -> None:
-        """Test that wrong number of options is rejected."""
+    @pytest.mark.parametrize("count", [3, 5])
+    def test_rejects_option_count_other_than_four(self, count: int) -> None:
         with pytest.raises(ValidationError):
+            MultipleChoiceQuestion(question="Test?", options=_options(count=count))
+
+    def test_rejects_no_correct_option(self) -> None:
+        with pytest.raises(ValidationError, match="exactly one correct option"):
             MultipleChoiceQuestion(
-                question="Test?",
-                options=[
-                    AnswerOption(label="A", text="Option A"),
-                    AnswerOption(label="B", text="Option B"),
-                ],
-                correct_answer="A",
+                question="Test?", options=_options(correct_index=None)
             )
 
-    def test_duplicate_labels(self) -> None:
-        """Test that duplicate option labels are rejected."""
-        with pytest.raises(ValidationError):
-            MultipleChoiceQuestion(
-                question="Test?",
-                options=[
-                    AnswerOption(label="A", text="Option A"),
-                    AnswerOption(label="A", text="Duplicate A"),
-                    AnswerOption(label="C", text="Option C"),
-                    AnswerOption(label="D", text="Option D"),
-                ],
-                correct_answer="A",
-            )
+    def test_rejects_multiple_correct_options(self) -> None:
+        options = _options()
+        options[1] = AnswerOption(text="Also right", is_correct=True)
 
-    def test_invalid_correct_answer(self) -> None:
-        """Test that invalid correct_answer is rejected."""
+        with pytest.raises(ValidationError, match="exactly one correct option"):
+            MultipleChoiceQuestion(question="Test?", options=options)
+
+    def test_rejects_old_shape_document(self) -> None:
         with pytest.raises(ValidationError):
-            MultipleChoiceQuestion(
-                question="Test?",
-                options=[
-                    AnswerOption(label="A", text="Option A"),
-                    AnswerOption(label="B", text="Option B"),
-                    AnswerOption(label="C", text="Option C"),
-                    AnswerOption(label="D", text="Option D"),
-                ],
-                correct_answer="E",
+            MultipleChoiceQuestion.model_validate(
+                {
+                    "question": "Test?",
+                    "options": [
+                        {"label": label, "text": f"Option {label}"} for label in "ABCD"
+                    ],
+                    "correct_answer": "A",
+                }
             )
 
 
 class TestQuizConfig:
-    """Tests for QuizConfig model."""
-
     def test_valid_config(self) -> None:
-        """Test creating a valid configuration."""
         config = QuizConfig(
             num_questions=5,
             difficulty=DifficultyLevel.MEDIUM,
@@ -139,7 +133,6 @@ class TestQuizConfig:
         assert config.azure_endpoint == "https://example.openai.azure.com"
 
     def test_default_values(self) -> None:
-        """Test that default values are set correctly."""
         config = QuizConfig(
             azure_endpoint="https://example.openai.azure.com",
             azure_api_key="test-key",
@@ -152,7 +145,6 @@ class TestQuizConfig:
         assert config.output_directory == "out"
 
     def test_num_questions_validation(self) -> None:
-        """Test that num_questions is validated."""
         with pytest.raises(ValidationError):
             QuizConfig(
                 num_questions=0,
@@ -169,10 +161,7 @@ class TestQuizConfig:
 
 
 class TestQuizResult:
-    """Tests for QuizResult model."""
-
     def test_valid_quiz_result(self) -> None:
-        """Test creating a valid quiz result."""
         config = QuizConfig(
             azure_endpoint="https://example.openai.azure.com",
             azure_api_key="test-key",
@@ -181,13 +170,7 @@ class TestQuizResult:
         questions = [
             MultipleChoiceQuestion(
                 question="Test?",
-                options=[
-                    AnswerOption(label="A", text="Option A"),
-                    AnswerOption(label="B", text="Option B"),
-                    AnswerOption(label="C", text="Option C"),
-                    AnswerOption(label="D", text="Option D"),
-                ],
-                correct_answer="A",
+                options=_options(),
             )
         ]
 

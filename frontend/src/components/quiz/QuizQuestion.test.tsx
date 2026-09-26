@@ -11,12 +11,11 @@ describe('QuizQuestion', () => {
   const mockQuestion = createQuestion({
     question: 'What is the capital of France?',
     options: [
-      { label: 'A', text: 'London' },
-      { label: 'B', text: 'Paris' },
-      { label: 'C', text: 'Berlin' },
-      { label: 'D', text: 'Madrid' },
+      { text: 'Madrid', is_correct: false },
+      { text: 'Paris', is_correct: true },
+      { text: 'Berlin', is_correct: false },
+      { text: 'London', is_correct: false },
     ],
-    correct_answer: 'B',
     difficulty: 'medium',
   });
 
@@ -28,7 +27,7 @@ describe('QuizQuestion', () => {
         question={mockQuestion}
         questionNumber={1}
         totalQuestions={10}
-        selectedAnswer={null}
+        selectedOptionIndex={null}
         onAnswerSelect={mockHandler}
       />
     );
@@ -44,7 +43,7 @@ describe('QuizQuestion', () => {
         question={mockQuestion}
         questionNumber={1}
         totalQuestions={10}
-        selectedAnswer={null}
+        selectedOptionIndex={null}
         onAnswerSelect={mockHandler}
       />
     );
@@ -55,6 +54,43 @@ describe('QuizQuestion', () => {
     expect(screen.getByText('Madrid')).toBeInTheDocument();
   });
 
+  it('should letter options top to bottom in the given order', () => {
+    render(
+      <QuizQuestion
+        question={mockQuestion}
+        questionNumber={1}
+        totalQuestions={10}
+        selectedOptionIndex={null}
+        onAnswerSelect={vi.fn()}
+      />
+    );
+
+    const buttons = screen.getAllByRole('button');
+    expect(buttons.map((button) => button.textContent)).toEqual([
+      'AMadrid',
+      'BParis',
+      'CBerlin',
+      'DLondon',
+    ]);
+  });
+
+  it('should mark the is_correct option and a wrong selection in review mode', () => {
+    render(
+      <QuizQuestion
+        question={mockQuestion}
+        questionNumber={1}
+        totalQuestions={10}
+        selectedOptionIndex={0}
+        onAnswerSelect={vi.fn()}
+        showResults={true}
+      />
+    );
+
+    expect(screen.getByText('Paris').closest('button')).toHaveClass('bg-green-100');
+    expect(screen.getByText('Madrid').closest('button')).toHaveClass('bg-red-100');
+    expect(screen.getByText('Berlin').closest('button')).not.toHaveClass('bg-red-100');
+  });
+
   it('should display question number and total', () => {
     const mockHandler = vi.fn();
 
@@ -63,7 +99,7 @@ describe('QuizQuestion', () => {
         question={mockQuestion}
         questionNumber={5}
         totalQuestions={15}
-        selectedAnswer={null}
+        selectedOptionIndex={null}
         onAnswerSelect={mockHandler}
       />
     );
@@ -79,7 +115,7 @@ describe('QuizQuestion', () => {
         question={mockQuestion}
         questionNumber={1}
         totalQuestions={10}
-        selectedAnswer={null}
+        selectedOptionIndex={null}
         onAnswerSelect={mockHandler}
       />
     );
@@ -95,7 +131,7 @@ describe('QuizQuestion', () => {
         question={mockQuestion}
         questionNumber={1}
         totalQuestions={10}
-        selectedAnswer={null}
+        selectedOptionIndex={null}
         onAnswerSelect={mockHandler}
       />
     );
@@ -103,7 +139,7 @@ describe('QuizQuestion', () => {
     const parisButton = screen.getByText('Paris').closest('button');
     parisButton?.click();
 
-    expect(mockHandler).toHaveBeenCalledWith('B');
+    expect(mockHandler).toHaveBeenCalledWith(1);
   });
 
   it('should show explanation in review mode', () => {
@@ -118,7 +154,7 @@ describe('QuizQuestion', () => {
         question={questionWithExplanation}
         questionNumber={1}
         totalQuestions={10}
-        selectedAnswer="B"
+        selectedOptionIndex={1}
         onAnswerSelect={mockHandler}
         showResults={true}
       />
@@ -140,7 +176,7 @@ describe('QuizQuestion', () => {
         question={questionWithExplanation}
         questionNumber={1}
         totalQuestions={10}
-        selectedAnswer={null}
+        selectedOptionIndex={null}
         onAnswerSelect={mockHandler}
         showResults={false}
       />
@@ -158,7 +194,7 @@ describe('QuizQuestion', () => {
         question={easyQuestion}
         questionNumber={1}
         totalQuestions={10}
-        selectedAnswer={null}
+        selectedOptionIndex={null}
         onAnswerSelect={mockHandler}
       />
     );
@@ -176,7 +212,7 @@ describe('QuizQuestion', () => {
         question={hardQuestion}
         questionNumber={1}
         totalQuestions={10}
-        selectedAnswer={null}
+        selectedOptionIndex={null}
         onAnswerSelect={mockHandler}
       />
     );

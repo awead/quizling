@@ -307,7 +307,7 @@ describe('Questions API Service', () => {
         expect(question).toHaveProperty('question')
         expect(question).toHaveProperty('options')
         expect(question.options).toHaveLength(4)
-        expect(question).toHaveProperty('correct_answer')
+        expect(question).not.toHaveProperty('correct_answer')
         expect(question).toHaveProperty('difficulty')
       })
     })
@@ -327,9 +327,9 @@ describe('Questions API Service', () => {
 
       // Validate answer options
       result.data.options.forEach((option) => {
-        expect(option).toHaveProperty('label')
+        expect(option).not.toHaveProperty('label')
         expect(option).toHaveProperty('text')
-        expect(['A', 'B', 'C', 'D']).toContain(option.label)
+        expect(typeof option.is_correct).toBe('boolean')
       })
     })
 

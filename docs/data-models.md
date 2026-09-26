@@ -26,8 +26,12 @@
 
 | Field | Type | Constraints |
 |---|---|---|
-| `label` | `"A" \| "B" \| "C" \| "D"` | required |
 | `text` | `str` | required, `min_length=1` |
+| `is_correct` | `bool` | required |
+
+Options carry no display label or position-based identity; correctness lives on the option itself.
+Documents and CLI JSON in the older labeled shape (`label` + `correct_answer`) fail validation and must be
+regenerated — there is no migration.
 
 ### `MultipleChoiceQuestion`
 
@@ -37,8 +41,7 @@ The core persisted entity — one MongoDB document per question.
 |---|---|---|
 | `id` | `str \| None` | Not stored as `_id` directly by name — `MongoDBClient` pops Mongo's `_id` and re-maps it to `id` on read; excluded on insert (`model_dump(exclude={"id"})`) so Mongo generates its own `_id`. |
 | `question` | `str` | required, `min_length=1` |
-| `options` | `list[AnswerOption]` | exactly 4 items (`min_length=4`, `max_length=4`); validator enforces the label set is exactly `{A, B, C, D}` and sorts options by label |
-| `correct_answer` | `"A" \| "B" \| "C" \| "D"` | validated against the same label set |
+| `options` | `list[AnswerOption]` | exactly 4 items (`min_length=4`, `max_length=4`); validator requires exactly one option with `is_correct=True`; stored order is preserved |
 | `explanation` | `str \| None` | optional |
 | `difficulty` | `DifficultyLevel` | default `medium` |
 
