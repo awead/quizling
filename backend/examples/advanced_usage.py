@@ -1,8 +1,8 @@
 import asyncio
-
-
 from pathlib import Path
+
 from quizling.base import DifficultyLevel, QuizConfig, QuizGenerator
+from quizling.base.generator import QuizGenerationError
 
 
 async def generate_focused_quiz() -> None:
@@ -107,7 +107,7 @@ async def batch_process_files() -> None:
             result = await generator.generate_from_file(file_path)
             results.append(result)
             print(f"  Generated {result.num_questions} questions")
-        except Exception as e:
+        except (OSError, ValueError, QuizGenerationError) as e:
             print(f"  Error: {e}")
 
     print(f"\nSuccessfully processed {len(results)} files")

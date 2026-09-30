@@ -5,7 +5,9 @@ from quizling.api.router import router
 
 app = FastAPI(
     title="Quizling API",
-    description="API for managing and retrieving quiz questions generated from documents",
+    description=(
+        "API for managing and retrieving quiz questions generated from documents"
+    ),
     version="0.1.0",
     docs_url="/docs",
     redoc_url="/redoc",
@@ -17,9 +19,11 @@ app.include_router(router)
 
 @app.get("/", tags=["health"])
 async def root() -> dict[str, str]:
+    """Report that the service is up, with its name."""
     return {"status": "healthy", "service": "Quizling API"}
 
 
 @app.get("/health", tags=["health"])
 async def health() -> dict[str, str]:
+    """Report that the service is up."""
     return {"status": "healthy"}

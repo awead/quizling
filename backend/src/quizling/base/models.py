@@ -42,12 +42,12 @@ class MultipleChoiceQuestion(BaseModel):
     def validate_single_correct_option(
         cls, options: list[AnswerOption]
     ) -> list[AnswerOption]:
+        """Reject option lists that don't have exactly one correct option."""
         correct_count = sum(option.is_correct for option in options)
 
         if correct_count != 1:
-            raise ValueError(
-                f"Options must have exactly one correct option. Got: {correct_count}"
-            )
+            msg = f"Options must have exactly one correct option. Got: {correct_count}"
+            raise ValueError(msg)
 
         return options
 
@@ -107,4 +107,5 @@ class QuizResult(BaseModel):
 
     @property
     def num_questions(self) -> int:
+        """Number of generated questions."""
         return len(self.questions)

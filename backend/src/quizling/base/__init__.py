@@ -1,8 +1,4 @@
-"""quizling.base
-
-Includes primary models, classes, and functions for generating multiple choice questions from text-based
-documents using OpenAI.
-"""
+"""Models and classes for generating multiple choice questions from documents."""
 
 from quizling.base.generator import QuizGenerator
 from quizling.base.models import (
@@ -14,10 +10,10 @@ from quizling.base.models import (
 )
 
 __all__ = [
-    "QuizGenerator",
     "AnswerOption",
     "DifficultyLevel",
     "MultipleChoiceQuestion",
     "QuizConfig",
+    "QuizGenerator",
     "QuizResult",
 ]

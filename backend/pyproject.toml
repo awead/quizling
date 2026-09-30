@@ -26,3 +26,38 @@ dev = [
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    # Conflict with `ruff format`.
+    "COM812",
+    # docs/coding-standards.md requires docstrings on public functions and methods only.
+    "D100",
+    "D101",
+    "D104",
+    "D105",
+    "D106",
+    "D107",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = [
+    # docs/coding-standards.md: tests get no docstrings.
+    "D",
+    # pytest is assert-based.
+    "S101",
+    # Tests compare against literal expected values.
+    "PLR2004",
+    # Tests inspect private helpers directly.
+    "SLF001",
+]
+# Standalone scripts, not a package: they print results and need no docstrings.
+"examples/**" = ["D", "T201", "INP001"]
+# CLI entry points and the IPython console write to the terminal.
+"src/quizling/__main__.py" = ["T201"]
+"src/quizling/storage/__main__.py" = ["T201"]
+"src/quizling/utils/console.py" = ["T201"]

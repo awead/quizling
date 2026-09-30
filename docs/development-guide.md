@@ -14,11 +14,17 @@ Install toolchain versions from the repo root:
 mise install
 ```
 
+## Make Targets
+
+There is no root `Makefile`. `backend/Makefile` and `frontend/Makefile` share target names — `install`, `test`,
+`test-cov`, `lint`, `format` — plus `api`/`console` (backend) and `dev`/`build` (frontend). Run them from the app
+directory or with `make -C backend <target>` / `make -C frontend <target>` from the root.
+
 ## Backend Setup
 
 ```bash
 cd backend
-uv sync                       # install dependencies (including dev group)
+make install                  # uv sync — install dependencies (including dev group)
 ```
 
 Environment variables are defined in the repository root `mise.toml` under `[env]`:
@@ -28,11 +34,11 @@ AZURE_OPENAI_ENDPOINT=https://aif-a8d20d36.cognitiveservices.azure.com
 AZURE_OPENAI_VERSION=2024-02-15-preview
 AZURE_OPENAI_DEPLOYMENT=gpt-5.5
 MONGO_DATABASE=quizling
-MONGODB_URI=mongodb://admin:password@localhost:27017/quizling
 ```
 
-`AZURE_OPENAI_KEY` is deliberately absent from `mise.toml`: fnox brokers it from Key Vault
-(`fnox.toml`), so run commands that hit Azure under `fnox exec -- <cmd>`.
+`AZURE_OPENAI_KEY`, `MONGODB_URI`, and `MONGO_ROOT_PASSWORD` are deliberately absent from `mise.toml`: they live in
+`fnox.toml` (the key is brokered from Key Vault; the Mongo values default to the local Compose instance), so run
+commands that need them with fnox's shell integration active or under `fnox exec -- <cmd>`.
 
 Note: `QuizConfig` (`backend/src/quizling/base/models.py`) reads `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_KEY`,
 `AZURE_OPENAI_DEPLOYMENT`, and `AZURE_OPENAI_VERSION` directly from `os.environ` at class-definition time — these
@@ -48,12 +54,15 @@ docker-compose up -d mongodb
 ### Generating and loading quiz questions (CLI)
 
 ```bash
-# Generate questions from a document
-uv run python -m quizling document.pdf -n 10 -d medium -o out
+# Generate questions from a document (one <uuid>.json per question in out/)
+fnox exec -- uv run python -m quizling document.pdf -n 10 -d medium -o out
 
-# Load the generated JSON files into MongoDB
-uv run python -m quizling.storage out --create-indexes
+# Load the generated JSON files into MongoDB (--clear to replace existing questions)
+fnox exec -- uv run python -m quizling.storage out --create-indexes
 ```
+
+Both commands need the Azure variables set, even the loader: it imports `quizling.base.models`, which reads them
+when the module is imported. See the root README's "Creating Questions" section for the full walkthrough.
 
 ### Running the API
 
@@ -74,9 +83,15 @@ make test-cov     # + coverage (terminal + htmlcov/ + coverage.xml)
 ### Backend Lint/Format
 
 ```bash
-uv run ruff check .
-uv run ruff format .
+make lint     # uv run ruff check . && uv run ruff format --check .
+make format   # uv run ruff format .
 ```
+
+Ruff is configured in `backend/pyproject.toml` with every rule enabled (`select = ["ALL"]`, Google docstring
+convention). The only rules switched off are the ones that conflict with `ruff format` or with
+`docs/coding-standards.md` (no docstrings required on modules, classes, or tests), plus test-, example-, and
+CLI-specific exemptions such as `assert` in tests and `print` in the CLIs. Each exemption is commented in
+`pyproject.toml`.
 
 ## Frontend Setup
 
@@ -127,7 +142,7 @@ npm run lint     # eslint .
 
 ## CI
 
-- `.github/workflows/test-backend.yml`: matrix over Python 3.11/3.12, `uv sync` + `uv run pytest`, with
+- `.github/workflows/test-backend.yml`: matrix over Python 3.11/3.12, `uv sync`, `make lint` (`ruff check` + `ruff format --check`), `uv run pytest`, with
   placeholder Azure/Mongo env vars (no real external services are hit in backend tests).
-- `.github/workflows/test-frontend.yml`: matrix over Node 22/24, `npm ci`, `npm run build` (type-check),
+- `.github/workflows/test-frontend.yml`: matrix over Node 22/24, `npm ci`, `make lint` (`eslint`), `npm run build` (type-check),
   `npm run test:run`, `npm run test:coverage`, coverage uploaded as a build artifact.

@@ -24,7 +24,7 @@ See [Project Overview](./project-overview.md#technology-stack-summary) for the f
 **Backend:** layered architecture within a single FastAPI service:
 - `api/` — HTTP boundary: `app.py` (FastAPI app + error handler registration), `router.py` (routes), `services.py`
   (`QuestionService`, `QuestionQueryParams`, `PaginationResult` — a small service/value-object layer), `models.py`
-  (response DTOs), `exceptions.py` (`QuizlingAPIException` hierarchy), `error_handlers.py` (maps exceptions to
+  (response DTOs), `exceptions.py` (`QuizlingAPIError` hierarchy), `error_handlers.py` (maps exceptions to
   `JSONResponse`s).
 - `base/` — the question-generation domain: `models.py` (`MultipleChoiceQuestion`, `QuizConfig`, `QuizResult`,
   `DifficultyLevel`), `generator.py` (`QuizGenerator`, wraps a PydanticAI `Agent` configured with `AsyncAzureOpenAI`),

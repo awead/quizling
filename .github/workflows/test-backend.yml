@@ -41,6 +41,10 @@ jobs:
         run: uv sync
         working-directory: backend
 
+      - name: Lint
+        run: make lint
+        working-directory: backend
+
       - name: Run tests
         run: uv run pytest
         working-directory: backend

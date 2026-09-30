@@ -28,9 +28,9 @@
 
 ## Existing Documentation
 
-- [Root README](../README.md) - Project pitch and feature list
-- [Backend README](../backend/README.md) - Backend installation, CLI usage, full API reference with examples, dev/test commands
-- [Frontend README](../frontend/README.md) - Minimal placeholder
+- [Root README](../README.md) - Project pitch, repo layout, setup, configuration, `make` targets for both apps
+- [Backend README](../backend/README.md) - CLI usage, MongoDB loader, full API reference with examples, dev/test commands (setup defers to the root README)
+- [Frontend README](../frontend/README.md) - Dev server, Vite env settings, npm scripts (setup defers to the root README)
 - [Backend TODO](../backend/TODO.md) - Known refactoring backlog (service layer, exception handling, DI, performance) — several items already implemented (checked items)
 - [.github/workflows/test-backend.yml](../.github/workflows/test-backend.yml) - Backend CI
 - [.github/workflows/test-frontend.yml](../.github/workflows/test-frontend.yml) - Frontend CI

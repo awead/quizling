@@ -3,27 +3,28 @@ from typing import Any
 from fastapi import HTTPException, status
 
 
-class QuizlingAPIException(Exception):
+class QuizlingAPIError(Exception):
     def __init__(
         self,
         message: str,
         status_code: int = 500,
         details: dict[str, Any] | None = None,
-    ):
+    ) -> None:
         self.message = message
         self.status_code = status_code
         self.details = details or {}
         super().__init__(self.message)
 
     def to_http_exception(self) -> HTTPException:
+        """Convert to an HTTPException with the same status code and details."""
         return HTTPException(
             status_code=self.status_code,
             detail={"message": self.message, **self.details},
         )
 
 
-class DatabaseError(QuizlingAPIException):
-    def __init__(self, message: str, operation: str | None = None):
+class DatabaseError(QuizlingAPIError):
+    def __init__(self, message: str, operation: str | None = None) -> None:
         super().__init__(
             message=message,
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -31,8 +32,8 @@ class DatabaseError(QuizlingAPIException):
         )
 
 
-class ResourceNotFoundError(QuizlingAPIException):
-    def __init__(self, resource_type: str, resource_id: str):
+class ResourceNotFoundError(QuizlingAPIError):
+    def __init__(self, resource_type: str, resource_id: str) -> None:
         super().__init__(
             message=f"{resource_type} not found",
             status_code=status.HTTP_404_NOT_FOUND,
@@ -40,8 +41,8 @@ class ResourceNotFoundError(QuizlingAPIException):
         )
 
 
-class InvalidObjectIdError(QuizlingAPIException):
-    def __init__(self, object_id: str):
+class InvalidObjectIdError(QuizlingAPIError):
+    def __init__(self, object_id: str) -> None:
         super().__init__(
             message="Invalid ObjectId format",
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -49,8 +50,8 @@ class InvalidObjectIdError(QuizlingAPIException):
         )
 
 
-class ValidationError(QuizlingAPIException):
-    def __init__(self, message: str, field: str | None = None):
+class ValidationError(QuizlingAPIError):
+    def __init__(self, message: str, field: str | None = None) -> None:
         super().__init__(
             message=message,
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,

@@ -1,38 +1,14 @@
-# Backend
+# Quizling (backend)
 
 Runs the API and generates questions from text-based content.
 
-## Installation
-
-This project uses `mise` to manage runtime tools and `uv` for Python package management.
-From the repository root:
-
-```bash
-mise install
-```
-
-Then install backend dependencies:
-
-```bash
-uv sync
-```
-
-## Configuration
-
-Environment variables are defined in root `mise.toml` under `[env]`:
-
-```env
-AZURE_OPENAI_ENDPOINT=https://aif-a8d20d36.cognitiveservices.azure.com
-AZURE_OPENAI_VERSION=2024-02-15-preview
-AZURE_OPENAI_DEPLOYMENT=gpt-5.5
-MONGO_DATABASE=quizling
-MONGODB_URI=******localhost:27017/quizling
-```
-
-`AZURE_OPENAI_KEY` is deliberately absent from `mise.toml`: fnox brokers it from Key Vault
-(`fnox.toml`), so run commands that hit Azure under `fnox exec -- <cmd>`.
+For project setup, configuration, and the `make` targets shared by both apps, see the
+[main README](../README.md). The commands below run from `backend/`.
 
 ## Usage
+
+For the end-to-end walkthrough (start MongoDB, generate, load), see
+[Creating Questions](../README.md#creating-questions) in the main README. This section is the option reference.
 
 ### Command Line Interface
 
@@ -46,8 +22,8 @@ uv run python -m quizling document.txt -n 10 -d easy
 # Focus on a specific topic
 uv run python -m quizling document.pdf -n 5 -t "machine learning" -d hard
 
-# Output only JSON format
-uv run python -m quizling document.txt --format json -o my_quiz
+# Write to a directory other than out/
+uv run python -m quizling document.txt -o my_quiz
 
 # Get help
 uv run python -m quizling --help
@@ -59,14 +35,39 @@ uv run python -m quizling --help
 - `-d, --difficulty`: Difficulty level: easy, medium, hard (default: medium)
 - `-t, --topic`: Specific topic to focus on
 - `--no-explanations`: Exclude explanations for answers
-- `-o, --output`: Output file path (default: quiz_output)
-- `--format`: Output format: json, text, both (default: both)
+- `-o, --output`: Directory to write questions to, one `<uuid>.json` file per question (default: out)
+- `-a, --api-version`: Azure OpenAI API version (default: 2024-12-01-preview — this overrides
+  `AZURE_OPENAI_VERSION`)
+
+### Loading Questions into MongoDB
+
+```bash
+# Load the generated JSON files in out/ into MongoDB
+uv run python -m quizling.storage out --create-indexes
+
+# Replace everything already in the database
+uv run python -m quizling.storage out --clear
+
+# Get help
+uv run python -m quizling.storage --help
+```
+
+#### Loader Options
+
+- `directory`: Directory of JSON question files (default: out)
+- `--pattern`: Glob pattern for the files to load (default: `*.json`)
+- `--mongodb-uri`: MongoDB connection URI (default: `MONGODB_URI`)
+- `--database`: Database name (default: `MONGO_DATABASE`)
+- `--clear`: Delete all existing questions before loading
+- `--create-indexes`: Create the database indexes after loading
+
+The loader does not skip duplicates, so loading the same files twice inserts them twice.
 
 ### Supported File Formats
 
 - **Text files**: `.txt`, `.md`
-- **PDF files**: `.pdf` (requires `pypdf`)
-- **Word documents**: `.docx` (requires `python-docx`)
+- **PDF files**: `.pdf`
+- **Word documents**: `.docx`
 
 ### Examples
 
@@ -83,10 +84,10 @@ uv run python examples/basic_usage.py
 
 ## Running the API
 
-You can run the API server using uvicorn:
-
 ```bash
-uvicorn quizling.api.app:app --reload
+make api
+# or
+uv run uvicorn quizling.api.app:app --reload
 ```
 
 The API will be available at `http://localhost:8000`
@@ -272,11 +273,11 @@ Coverage reports are generated in:
 - `htmlcov/` directory (detailed HTML report - open `htmlcov/index.html` in your browser)
 - `coverage.xml` (for CI/CD)
 
-### Code Formatting
+### Linting and Formatting
 
 ```bash
-uv run ruff check .
-uv run ruff format .
+make lint     # ruff check + ruff format --check
+make format   # ruff format
 ```
 
 ## License

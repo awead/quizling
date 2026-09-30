@@ -18,7 +18,7 @@ class QuestionQueryParams:
         search: str | None = None,
         cursor: int = 0,
         limit: int = 20,
-    ):
+    ) -> None:
         self.difficulty = difficulty
         self.search = search
         self.cursor = cursor
@@ -26,6 +26,7 @@ class QuestionQueryParams:
 
     @property
     def has_filters(self) -> bool:
+        """Whether a difficulty or search filter is set."""
         return self.difficulty is not None or self.search is not None
 
 
@@ -38,7 +39,7 @@ class PaginationResult:
         cursor: int,
         limit: int,
         total_results: int,
-    ):
+    ) -> None:
         self.has_more = len(questions) > limit
         self.questions = questions[:limit] if self.has_more else questions
         self.next_cursor = str(cursor + limit) if self.has_more else None
@@ -48,47 +49,47 @@ class PaginationResult:
 class QuestionService:
     """Service for handling question operations."""
 
-    def __init__(self, db: MongoDBClient):
+    def __init__(self, db: MongoDBClient) -> None:
         self._db = db
 
     def get_questions(self, params: QuestionQueryParams) -> PaginationResult:
+        """Fetch one page of questions matching the difficulty and search filters.
+
+        Raises DatabaseError if the query fails.
+        """
         try:
             fetch_limit = params.limit + 1
             questions = self._fetch_filtered_questions(params, fetch_limit)
             total_results = self._calculate_total(params, questions)
-
-            return PaginationResult(
-                questions=questions,
-                cursor=params.cursor,
-                limit=params.limit,
-                total_results=total_results,
-            )
-        except (DatabaseError, ResourceNotFoundError, InvalidObjectIdError):
-            raise  # re-raises with our custom exceptions
         except Exception as e:
-            raise DatabaseError(
-                f"Failed to retrieve questions: {str(e)}", operation="get_questions"
-            )
+            msg = f"Failed to retrieve questions: {e!s}"
+            raise DatabaseError(msg, operation="get_questions") from e
+
+        return PaginationResult(
+            questions=questions,
+            cursor=params.cursor,
+            limit=params.limit,
+            total_results=total_results,
+        )
 
     def _fetch_filtered_questions(
         self, params: QuestionQueryParams, fetch_limit: int
     ) -> list[MultipleChoiceQuestion]:
         if params.difficulty and params.search:
             return self._search_with_difficulty(params, fetch_limit)
-        elif params.difficulty:
+        if params.difficulty:
             return self._paginate_filtered_results(
                 self._db.get_questions_by_difficulty(params.difficulty),
                 params.cursor,
                 fetch_limit,
             )
-        elif params.search:
+        if params.search:
             return self._paginate_filtered_results(
                 self._db.search_questions(params.search),
                 params.cursor,
                 fetch_limit,
             )
-        else:
-            return self._db.get_all_questions(limit=fetch_limit, skip=params.cursor)
+        return self._db.get_all_questions(limit=fetch_limit, skip=params.cursor)
 
     def _search_with_difficulty(
         self, params: QuestionQueryParams, fetch_limit: int
@@ -109,20 +110,24 @@ class QuestionService:
     ) -> int:
         if params.has_filters:
             return len(questions)
-        else:
-            return self._db.count_questions()
+        return self._db.count_questions()
 
     def get_question_by_id(self, question_id: str) -> MultipleChoiceQuestion:
+        """Fetch a single question by its MongoDB ObjectId.
+
+        Raises InvalidObjectIdError if the id is malformed, ResourceNotFoundError if
+        no question has that id, and DatabaseError if the query fails.
+        """
         try:
             question = self._db.get_question(question_id)
-            if question is None:
-                raise ResourceNotFoundError("Question", question_id)
-            return question
-        except InvalidId:
-            raise InvalidObjectIdError(question_id)
-        except (ResourceNotFoundError, InvalidObjectIdError):
-            raise  # re-raises with our custom exceptions
+        except InvalidId as e:
+            raise InvalidObjectIdError(question_id) from e
         except Exception as e:
-            raise DatabaseError(
-                f"Failed to retrieve question: {str(e)}", operation="get_question"
+            msg = f"Failed to retrieve question: {e!s}"
+            raise DatabaseError(msg, operation="get_question") from e
+
+        if question is None:
+            raise ResourceNotFoundError(
+                resource_type="Question", resource_id=question_id
             )
+        return question

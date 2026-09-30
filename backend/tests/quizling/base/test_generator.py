@@ -1,8 +1,9 @@
 import tempfile
+from pathlib import Path
+from unittest.mock import AsyncMock, MagicMock, patch
+
 import pytest
 
-
-from pathlib import Path
 from quizling.base.generator import QuizGenerator
 from quizling.base.models import (
     AnswerOption,
@@ -11,7 +12,6 @@ from quizling.base.models import (
     QuizConfig,
     QuizResult,
 )
-from unittest.mock import AsyncMock, MagicMock, patch
 
 
 @pytest.fixture
@@ -134,7 +134,7 @@ class TestQuizGenerator:
             mock_run.return_value = mock_result
 
             text = (
-                "This is a test content that is long enough to generate questions from. "
+                "This is test content that is long enough to generate questions from. "
                 * 5
             )
             result = await generator.generate_from_text(text)

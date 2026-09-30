@@ -1,11 +1,12 @@
-import pytest
 import tempfile
-
 from io import StringIO
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
+import pytest
+
 from quizling.__main__ import main, parse_args
+from quizling.base.generator import QuizGenerationError
 from quizling.base.models import (
     AnswerOption,
     DifficultyLevel,
@@ -85,9 +86,11 @@ class TestParseArgs:
             assert args.api_version == "2024-01-01"
 
     def test_parse_args_invalid_difficulty(self) -> None:
-        with patch("sys.argv", ["quizling", "test.txt", "-d", "invalid"]):
-            with pytest.raises(SystemExit):
-                parse_args()
+        with (
+            patch("sys.argv", ["quizling", "test.txt", "-d", "invalid"]),
+            pytest.raises(SystemExit),
+        ):
+            parse_args()
 
 
 class TestMain:
@@ -168,16 +171,17 @@ class TestMain:
 
     @pytest.mark.asyncio
     async def test_main_file_not_found(self) -> None:
-        with patch("sys.argv", ["quizling", "nonexistent.txt"]):
-            with pytest.raises(SystemExit) as exc_info:
-                captured_error = StringIO()
-                with patch("sys.stderr", captured_error):
-                    await main()
+        with (
+            patch("sys.argv", ["quizling", "nonexistent.txt"]),
+            patch("sys.stderr", StringIO()),
+            pytest.raises(SystemExit) as exc_info,
+        ):
+            await main()
 
-            assert exc_info.value.code == 1
+        assert exc_info.value.code == 1
 
     @pytest.mark.asyncio
-    async def test_main_generator_error(self, sample_quiz_result: QuizResult) -> None:
+    async def test_main_generator_error(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             test_file = Path(tmp_dir) / "test.txt"
             test_file.write_text("Test content")
@@ -185,18 +189,19 @@ class TestMain:
             with patch("sys.argv", ["quizling", str(test_file)]):
                 mock_generator = MagicMock()
                 mock_generator.generate_from_file = AsyncMock(
-                    side_effect=Exception("Generation failed")
+                    side_effect=QuizGenerationError("Generation failed")
                 )
 
-                with patch(
-                    "quizling.__main__.QuizGenerator", return_value=mock_generator
+                with (
+                    patch(
+                        "quizling.__main__.QuizGenerator", return_value=mock_generator
+                    ),
+                    patch("sys.stderr", StringIO()),
+                    pytest.raises(SystemExit) as exc_info,
                 ):
-                    with pytest.raises(SystemExit) as exc_info:
-                        captured_error = StringIO()
-                        with patch("sys.stderr", captured_error):
-                            await main()
+                    await main()
 
-                    assert exc_info.value.code == 1
+                assert exc_info.value.code == 1
 
     @pytest.mark.asyncio
     async def test_main_with_custom_options(
