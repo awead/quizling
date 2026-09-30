@@ -122,12 +122,11 @@ GET /questions?limit=20&cursor=0
     {
       "question": "What is 2+2?",
       "options": [
-        {"label": "A", "text": "3"},
-        {"label": "B", "text": "4"},
-        {"label": "C", "text": "5"},
-        {"label": "D", "text": "6"}
+        {"text": "3", "is_correct": false},
+        {"text": "4", "is_correct": true},
+        {"text": "5", "is_correct": false},
+        {"text": "6", "is_correct": false}
       ],
-      "correct_answer": "B",
       "explanation": "2+2=4",
       "difficulty": "easy"
     }
@@ -179,12 +178,11 @@ GET /questions/{question_id}
   "data": {
     "question": "What is 2+2?",
     "options": [
-      {"label": "A", "text": "3"},
-      {"label": "B", "text": "4"},
-      {"label": "C", "text": "5"},
-      {"label": "D", "text": "6"}
+      {"text": "3", "is_correct": false},
+      {"text": "4", "is_correct": true},
+      {"text": "5", "is_correct": false},
+      {"text": "6", "is_correct": false}
     ],
-    "correct_answer": "B",
     "explanation": "2+2=4",
     "difficulty": "easy"
   }

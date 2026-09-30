@@ -22,8 +22,8 @@ import type {
 export const createAnswerOption = (
   overrides?: Partial<AnswerOption>
 ): AnswerOption => ({
-  label: 'A',
   text: 'Sample answer',
+  is_correct: false,
   ...overrides,
 })
 
@@ -36,12 +36,11 @@ export const createQuestion = (
   id: '507f1f77bcf86cd799439011',
   question: 'What is the capital of France?',
   options: [
-    { label: 'A', text: 'London' },
-    { label: 'B', text: 'Paris' },
-    { label: 'C', text: 'Berlin' },
-    { label: 'D', text: 'Madrid' },
+    { text: 'London', is_correct: false },
+    { text: 'Paris', is_correct: true },
+    { text: 'Berlin', is_correct: false },
+    { text: 'Madrid', is_correct: false },
   ],
-  correct_answer: 'B',
   explanation: 'Paris is the capital and most populous city of France.',
   difficulty: 'medium',
   ...overrides,

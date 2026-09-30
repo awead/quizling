@@ -1,5 +1,3 @@
-"""Pytest configuration for API tests."""
-
 import os
 
 import pytest
@@ -7,7 +5,6 @@ import pytest
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_test_environment():
-    """Set up environment variables for tests."""
     os.environ.setdefault("AZURE_OPENAI_ENDPOINT", "https://test.openai.azure.com")
     os.environ.setdefault("AZURE_OPENAI_KEY", "test-key")
     os.environ.setdefault("AZURE_OPENAI_DEPLOYMENT", "gpt-5-mini")

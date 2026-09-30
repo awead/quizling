@@ -49,12 +49,11 @@ Retrieve questions with optional filtering and cursor-based pagination.
       "id": "507f1f77bcf86cd799439011",
       "question": "What is 2+2?",
       "options": [
-        {"label": "A", "text": "3"},
-        {"label": "B", "text": "4"},
-        {"label": "C", "text": "5"},
-        {"label": "D", "text": "6"}
+        {"text": "3", "is_correct": false},
+        {"text": "4", "is_correct": true},
+        {"text": "5", "is_correct": false},
+        {"text": "6", "is_correct": false}
       ],
-      "correct_answer": "B",
       "explanation": "2+2=4",
       "difficulty": "easy"
     }
@@ -84,7 +83,7 @@ Retrieve a single question by its MongoDB ObjectId.
 
 **Response 200** (`QuestionResponse`):
 ```json
-{ "data": { "id": "...", "question": "...", "options": [...], "correct_answer": "B", "explanation": "...", "difficulty": "easy" } }
+{ "data": { "id": "...", "question": "...", "options": [...], "explanation": "...", "difficulty": "easy" } }
 ```
 
 **Response 404** (`ErrorResponse`): question not found (raised as `ResourceNotFoundError`).

@@ -6,7 +6,12 @@ import { renderHook, waitFor, act } from '@testing-library/react';
 import { useQuiz } from './useQuiz';
 import { fetchQuestions } from '@/api';
 import { createQuestions, createPaginatedResponse } from '@/test/factories';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
+// With Math.random pinned, shuffle() is deterministic: 0.99 keeps the stored
+// order, 0 rotates the first option to the end (London, Paris, … → Paris, …, London).
+const KEEP_ORDER = 0.99;
+const ROTATE = 0;
 
 // Mock the API module
 vi.mock('@/api', () => ({
@@ -16,7 +21,21 @@ vi.mock('@/api', () => ({
 describe('useQuiz', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.spyOn(Math, 'random').mockReturnValue(KEEP_ORDER);
   });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  async function startQuiz(result: { current: ReturnType<typeof useQuiz> }) {
+    act(() => {
+      result.current.startQuiz();
+    });
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
+  }
 
   it('should initialize with correct default state', () => {
     const { result } = renderHook(() => useQuiz(15));
@@ -80,35 +99,84 @@ describe('useQuiz', () => {
     expect(result.current.questions).toEqual([]);
   });
 
-  it('should select answer and track if correct', async () => {
+  it('should grade a selection by the option is_correct flag', async () => {
     const mockQuestions = createQuestions(3);
-    // Set known correct answer for first question
-    mockQuestions[0].correct_answer = 'B';
-    const mockResponse = createPaginatedResponse({
-      data: mockQuestions,
-      total: 3,
-    });
-    vi.mocked(fetchQuestions).mockResolvedValue(mockResponse);
+    vi.mocked(fetchQuestions).mockResolvedValue(
+      createPaginatedResponse({ data: mockQuestions, total: 3 })
+    );
 
     const { result } = renderHook(() => useQuiz(3));
+    await startQuiz(result);
 
+    const parisIndex = result.current.currentQuestion!.options.findIndex(
+      (option) => option.text === 'Paris'
+    );
     act(() => {
-      result.current.startQuiz();
-    });
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
-
-    // Select correct answer
-    act(() => {
-      result.current.selectAnswer('B');
+      result.current.selectAnswer(parisIndex);
     });
 
     expect(result.current.userAnswers.size).toBe(1);
-    expect(result.current.selectedAnswer).toBe('B');
-    const answer = result.current.userAnswers.get(mockQuestions[0].id);
-    expect(answer?.isCorrect).toBe(true);
+    expect(result.current.selectedOptionIndex).toBe(parisIndex);
+    expect(result.current.userAnswers.get(mockQuestions[0].id)?.isCorrect).toBe(true);
+
+    const londonIndex = result.current.currentQuestion!.options.findIndex(
+      (option) => option.text === 'London'
+    );
+    act(() => {
+      result.current.selectAnswer(londonIndex);
+    });
+
+    expect(result.current.userAnswers.get(mockQuestions[0].id)?.isCorrect).toBe(false);
+  });
+
+  it('should shuffle options when a new quiz starts', async () => {
+    const [question] = createQuestions(1);
+    vi.mocked(fetchQuestions).mockResolvedValue(
+      createPaginatedResponse({ data: [question], total: 1 })
+    );
+    const { result } = renderHook(() => useQuiz(1));
+
+    await startQuiz(result);
+    const firstRunCorrectIndex = result.current.currentQuestion!.options.findIndex(
+      (option) => option.is_correct
+    );
+
+    vi.mocked(Math.random).mockReturnValue(ROTATE);
+    await startQuiz(result);
+    const secondRunCorrectIndex = result.current.currentQuestion!.options.findIndex(
+      (option) => option.is_correct
+    );
+
+    expect(firstRunCorrectIndex).toBe(1);
+    expect(secondRunCorrectIndex).toBe(0);
+
+    act(() => {
+      result.current.selectAnswer(secondRunCorrectIndex);
+    });
+    expect(result.current.score).toBe(1);
+  });
+
+  it('should keep option order stable within a quiz', async () => {
+    vi.mocked(Math.random).mockReturnValue(ROTATE);
+    vi.mocked(fetchQuestions).mockResolvedValue(
+      createPaginatedResponse({ data: createQuestions(2), total: 2 })
+    );
+    const { result, rerender } = renderHook(() => useQuiz(2));
+    await startQuiz(result);
+    const optionsBefore = result.current.currentQuestion!.options;
+
+    vi.mocked(Math.random).mockReturnValue(KEEP_ORDER);
+    rerender();
+    act(() => {
+      result.current.selectAnswer(2);
+      result.current.nextQuestion();
+    });
+    act(() => {
+      result.current.previousQuestion();
+    });
+
+    expect(result.current.currentQuestion!.options).toEqual(optionsBefore);
+    expect(result.current.selectedOptionIndex).toBe(2);
   });
 
   it('should navigate through questions', async () => {
@@ -161,41 +229,26 @@ describe('useQuiz', () => {
   });
 
   it('should calculate score correctly', async () => {
-    const mockQuestions = createQuestions(3);
-    mockQuestions[0].correct_answer = 'A';
-    mockQuestions[1].correct_answer = 'B';
-    mockQuestions[2].correct_answer = 'C';
-    const mockResponse = createPaginatedResponse({
-      data: mockQuestions,
-      total: 3,
-    });
-    vi.mocked(fetchQuestions).mockResolvedValue(mockResponse);
+    // Factory questions keep Paris (the correct option) at index 1 under KEEP_ORDER.
+    vi.mocked(fetchQuestions).mockResolvedValue(
+      createPaginatedResponse({ data: createQuestions(3), total: 3 })
+    );
 
     const { result } = renderHook(() => useQuiz(3));
+    await startQuiz(result);
 
     act(() => {
-      result.current.startQuiz();
-    });
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
-
-    // Answer first question correctly
-    act(() => {
-      result.current.selectAnswer('A');
+      result.current.selectAnswer(1);
       result.current.nextQuestion();
     });
 
-    // Answer second question incorrectly
     act(() => {
-      result.current.selectAnswer('D');
+      result.current.selectAnswer(3);
       result.current.nextQuestion();
     });
 
-    // Answer third question correctly
     act(() => {
-      result.current.selectAnswer('C');
+      result.current.selectAnswer(1);
     });
 
     expect(result.current.score).toBe(2);
@@ -248,7 +301,7 @@ describe('useQuiz', () => {
 
     // Answer some questions
     act(() => {
-      result.current.selectAnswer('A');
+      result.current.selectAnswer(0);
       result.current.nextQuestion();
       result.current.submitQuiz();
     });

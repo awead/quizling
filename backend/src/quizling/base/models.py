@@ -1,6 +1,5 @@
 import os
 from enum import Enum
-from typing import ClassVar, Literal
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -12,16 +11,12 @@ class DifficultyLevel(str, Enum):
 
 
 class AnswerOption(BaseModel):
-    label: Literal["A", "B", "C", "D"] = Field(
-        description="The option label (A, B, C, or D)"
-    )
-
     text: str = Field(description="The answer option text", min_length=1)
+
+    is_correct: bool = Field(description="Whether this option is a correct answer")
 
 
 class MultipleChoiceQuestion(BaseModel):
-    VALID_LABELS: ClassVar[frozenset[str]] = frozenset(["A", "B", "C", "D"])
-
     id: str | None = Field(
         default=None, description="Optional unique identifier for the question"
     )
@@ -29,13 +24,9 @@ class MultipleChoiceQuestion(BaseModel):
     question: str = Field(description="The question text", min_length=1)
 
     options: list[AnswerOption] = Field(
-        description="Four answer options labeled A through D",
+        description="Four answer options, exactly one of which is correct",
         min_length=4,
         max_length=4,
-    )
-
-    correct_answer: Literal["A", "B", "C", "D"] = Field(
-        description="The label of the correct answer"
     )
 
     explanation: str | None = Field(
@@ -48,25 +39,17 @@ class MultipleChoiceQuestion(BaseModel):
 
     @field_validator("options")
     @classmethod
-    def validate_options_labels(cls, options: list[AnswerOption]) -> list[AnswerOption]:
-        actual_labels = {option.label for option in options}
+    def validate_single_correct_option(
+        cls, options: list[AnswerOption]
+    ) -> list[AnswerOption]:
+        correct_count = sum(option.is_correct for option in options)
 
-        if actual_labels != cls.VALID_LABELS:
+        if correct_count != 1:
             raise ValueError(
-                f"Options must have labels A, B, C, D. Got: {actual_labels}"
+                f"Options must have exactly one correct option. Got: {correct_count}"
             )
 
-        sorted_options = sorted(options, key=lambda x: x.label)
-        return sorted_options
-
-    @field_validator("correct_answer")
-    @classmethod
-    def validate_correct_answer(cls, correct_answer: str) -> str:
-        if correct_answer not in cls.VALID_LABELS:
-            raise ValueError(
-                f"Correct answer must be A, B, C, or D. Got: {correct_answer}"
-            )
-        return correct_answer
+        return options
 
 
 class QuizConfig(BaseModel):

@@ -40,7 +40,8 @@ async def generate_focused_quiz() -> None:
 
     for i, question in enumerate(result.questions, 1):
         print(f"Question {i}: {question.question}")
-        print(f"Correct Answer: {question.correct_answer}")
+        correct = next(option for option in question.options if option.is_correct)
+        print(f"Correct Answer: {correct.text}")
         print()
 
 

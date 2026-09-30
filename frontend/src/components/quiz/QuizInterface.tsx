@@ -16,7 +16,7 @@ export default function QuizInterface({ questionCount = 15 }: QuizInterfaceProps
     questions,
     currentQuestionIndex,
     currentQuestion,
-    selectedAnswer,
+    selectedOptionIndex,
     userAnswers,
     isLoading,
     error,
@@ -136,7 +136,7 @@ export default function QuizInterface({ questionCount = 15 }: QuizInterfaceProps
           question={currentQuestion}
           questionNumber={currentQuestionIndex + 1}
           totalQuestions={totalQuestions}
-          selectedAnswer={selectedAnswer}
+          selectedOptionIndex={selectedOptionIndex}
           onAnswerSelect={selectAnswer}
         />
       </Card>

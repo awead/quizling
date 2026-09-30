@@ -1,15 +1,15 @@
-import { useMemo } from 'react';
-import type { MultipleChoiceQuestion, AnswerOption as AnswerOptionType } from '@/types';
+import type { MultipleChoiceQuestion } from '@/types';
 import AnswerOption from './AnswerOption';
 import { getDifficultyColor } from '@/utils/difficulty';
+import { optionLetter } from '@/utils/options';
 import { useFocusOnMount } from '@/hooks';
 
 export interface QuizQuestionProps {
   question: MultipleChoiceQuestion;
   questionNumber: number;
   totalQuestions: number;
-  selectedAnswer: 'A' | 'B' | 'C' | 'D' | null;
-  onAnswerSelect: (answer: 'A' | 'B' | 'C' | 'D') => void;
+  selectedOptionIndex: number | null;
+  onAnswerSelect: (optionIndex: number) => void;
   showResults?: boolean;
 }
 
@@ -17,13 +17,10 @@ export default function QuizQuestion({
   question,
   questionNumber,
   totalQuestions,
-  selectedAnswer,
+  selectedOptionIndex,
   onAnswerSelect,
   showResults = false,
 }: QuizQuestionProps) {
-  // Shuffle is already done by the backend - options are in the correct order
-  const options = useMemo(() => question.options, [question.options]);
-
   // Focus the question heading when it mounts
   const headingRef = useFocusOnMount<HTMLHeadingElement>();
 
@@ -54,21 +51,21 @@ export default function QuizQuestion({
 
       {/* Answer options */}
       <div className="space-y-3">
-        {options.map((option: AnswerOptionType) => {
-          const isSelected = selectedAnswer === option.label;
-          const isCorrect = showResults && option.label === question.correct_answer;
-          const isIncorrect = showResults && isSelected && option.label !== question.correct_answer;
+        {question.options.map((option, index) => {
+          const isSelected = selectedOptionIndex === index;
+          const isCorrect = showResults && option.is_correct;
+          const isIncorrect = showResults && isSelected && !option.is_correct;
 
           return (
             <AnswerOption
-              key={option.label}
-              label={option.label}
+              key={index}
+              label={optionLetter(index)}
               text={option.text}
               isSelected={isSelected}
               isCorrect={isCorrect}
               isIncorrect={isIncorrect}
               showResults={showResults}
-              onClick={() => onAnswerSelect(option.label)}
+              onClick={() => onAnswerSelect(index)}
             />
           );
         })}

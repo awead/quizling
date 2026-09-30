@@ -98,6 +98,9 @@ of ignoring the linter.
 - **Docstrings are for public methods/functions only** — anything importable and used outside its own module/class
   (API route handlers, service methods, exported utilities, public component props). Private/internal helpers
   (leading `_` in Python, non-exported functions/components in TypeScript) do not get docstrings.
+- **Tests get no docstrings** — not on test modules, test classes, test functions, or fixtures. The test name
+  already states the behavior under test; a docstring restating it is duplication. If a test needs more
+  explanation than its name gives, rename it.
 - Docstrings describe behavior, inputs, outputs, and exceptions/edge cases — not implementation detail.
 
 Python example:

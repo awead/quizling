@@ -28,6 +28,13 @@ describe('QuestionCard', () => {
     expect(badge).toHaveClass('uppercase')
   })
 
+  it('should show the first stored option lettered A', () => {
+    const question = createQuestion()
+    render(<QuestionCard question={question} />)
+
+    expect(screen.getByText('A:').parentElement).toHaveTextContent('A: London')
+  })
+
   it('should link to question detail page', () => {
     const question = createQuestion({ id: '507f1f77bcf86cd799439011' })
 

@@ -16,10 +16,7 @@ from quizling.base.models import (
 
 
 class TestParseArgs:
-    """Tests for command-line argument parsing."""
-
     def test_parse_args_minimal(self) -> None:
-        """Test parsing with only required arguments."""
         with patch("sys.argv", ["quizling", "test.txt"]):
             args = parse_args()
 
@@ -32,7 +29,6 @@ class TestParseArgs:
             assert args.api_version == "2024-12-01-preview"
 
     def test_parse_args_all_options(self) -> None:
-        """Test parsing with all options specified."""
         with patch(
             "sys.argv",
             [
@@ -62,7 +58,6 @@ class TestParseArgs:
             assert args.api_version == "2024-06-01"
 
     def test_parse_args_long_options(self) -> None:
-        """Test parsing with long option names."""
         with patch(
             "sys.argv",
             [
@@ -90,18 +85,14 @@ class TestParseArgs:
             assert args.api_version == "2024-01-01"
 
     def test_parse_args_invalid_difficulty(self) -> None:
-        """Test that invalid difficulty values are rejected."""
         with patch("sys.argv", ["quizling", "test.txt", "-d", "invalid"]):
             with pytest.raises(SystemExit):
                 parse_args()
 
 
 class TestMain:
-    """Tests for the main function."""
-
     @pytest.fixture
     def sample_quiz_result(self) -> QuizResult:
-        """Create a sample QuizResult for testing."""
         config = QuizConfig(
             num_questions=2,
             difficulty=DifficultyLevel.MEDIUM,
@@ -117,24 +108,22 @@ class TestMain:
             MultipleChoiceQuestion(
                 question="What is 2+2?",
                 options=[
-                    AnswerOption(label="A", text="3"),
-                    AnswerOption(label="B", text="4"),
-                    AnswerOption(label="C", text="5"),
-                    AnswerOption(label="D", text="6"),
+                    AnswerOption(text="3", is_correct=False),
+                    AnswerOption(text="4", is_correct=True),
+                    AnswerOption(text="5", is_correct=False),
+                    AnswerOption(text="6", is_correct=False),
                 ],
-                correct_answer="B",
                 explanation="2+2=4",
                 difficulty=DifficultyLevel.EASY,
             ),
             MultipleChoiceQuestion(
                 question="What is the capital of France?",
                 options=[
-                    AnswerOption(label="A", text="London"),
-                    AnswerOption(label="B", text="Paris"),
-                    AnswerOption(label="C", text="Berlin"),
-                    AnswerOption(label="D", text="Madrid"),
+                    AnswerOption(text="London", is_correct=False),
+                    AnswerOption(text="Paris", is_correct=True),
+                    AnswerOption(text="Berlin", is_correct=False),
+                    AnswerOption(text="Madrid", is_correct=False),
                 ],
-                correct_answer="B",
                 explanation="Paris is the capital of France",
                 difficulty=DifficultyLevel.EASY,
             ),
@@ -144,7 +133,6 @@ class TestMain:
 
     @pytest.mark.asyncio
     async def test_main_success(self, sample_quiz_result: QuizResult) -> None:
-        """Test successful execution of main function."""
         with tempfile.TemporaryDirectory() as tmp_dir:
             test_file = Path(tmp_dir) / "test.txt"
             test_file.write_text("Test content")
@@ -180,7 +168,6 @@ class TestMain:
 
     @pytest.mark.asyncio
     async def test_main_file_not_found(self) -> None:
-        """Test main function with non-existent file."""
         with patch("sys.argv", ["quizling", "nonexistent.txt"]):
             with pytest.raises(SystemExit) as exc_info:
                 captured_error = StringIO()
@@ -191,7 +178,6 @@ class TestMain:
 
     @pytest.mark.asyncio
     async def test_main_generator_error(self, sample_quiz_result: QuizResult) -> None:
-        """Test main function when generator raises an error."""
         with tempfile.TemporaryDirectory() as tmp_dir:
             test_file = Path(tmp_dir) / "test.txt"
             test_file.write_text("Test content")
@@ -216,7 +202,6 @@ class TestMain:
     async def test_main_with_custom_options(
         self, sample_quiz_result: QuizResult
     ) -> None:
-        """Test main function with custom CLI options."""
         with tempfile.TemporaryDirectory() as tmp_dir:
             test_file = Path(tmp_dir) / "test.txt"
             test_file.write_text("Test content")
@@ -269,7 +254,6 @@ class TestMain:
 
     @pytest.mark.asyncio
     async def test_main_prints_file_paths(self, sample_quiz_result: QuizResult) -> None:
-        """Test that main function prints the paths of written files."""
         with tempfile.TemporaryDirectory() as tmp_dir:
             test_file = Path(tmp_dir) / "test.txt"
             test_file.write_text("Test content")
@@ -300,7 +284,6 @@ class TestMain:
     async def test_main_difficulty_mapping(
         self, sample_quiz_result: QuizResult
     ) -> None:
-        """Test that difficulty string is correctly mapped to DifficultyLevel enum."""
         with tempfile.TemporaryDirectory() as tmp_dir:
             test_file = Path(tmp_dir) / "test.txt"
             test_file.write_text("Test content")

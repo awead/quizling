@@ -8,15 +8,14 @@
 export type DifficultyLevel = 'easy' | 'medium' | 'hard';
 
 export interface AnswerOption {
-  label: 'A' | 'B' | 'C' | 'D';
   text: string;
+  is_correct: boolean;
 }
 
 export interface MultipleChoiceQuestion {
   id: string; 
   question: string;
   options: AnswerOption[];
-  correct_answer: 'A' | 'B' | 'C' | 'D';
   explanation: string | null;
   difficulty: DifficultyLevel;
 }

@@ -39,10 +39,11 @@ import { useState, useCallback, useMemo } from 'react';
 import { fetchQuestions } from '@/api';
 import { ApiError } from '@/api/errors';
 import type { MultipleChoiceQuestion } from '@/types';
+import { shuffle } from '@/utils/shuffle';
 
 export interface UserAnswer {
   questionId: string;
-  selectedAnswer: 'A' | 'B' | 'C' | 'D';
+  selectedOptionIndex: number;
   isCorrect: boolean;
 }
 
@@ -58,7 +59,7 @@ interface UseQuizReturn {
 
   // Computed values
   currentQuestion: MultipleChoiceQuestion | null;
-  selectedAnswer: 'A' | 'B' | 'C' | 'D' | null;
+  selectedOptionIndex: number | null;
   score: number;
   totalQuestions: number;
   isFirstQuestion: boolean;
@@ -68,7 +69,7 @@ interface UseQuizReturn {
 
   // Methods
   startQuiz: () => void;
-  selectAnswer: (answer: 'A' | 'B' | 'C' | 'D') => void;
+  selectAnswer: (optionIndex: number) => void;
   nextQuestion: () => void;
   previousQuestion: () => void;
   submitQuiz: () => void;
@@ -97,7 +98,11 @@ export function useQuiz(questionCount: number = 15): UseQuizReturn {
         return;
       }
 
-      setQuestions(response.data);
+      // Shuffled once per load so the correct option's letter varies between
+      // quizzes; the order then stays fixed for the rest of this quiz.
+      setQuestions(
+        response.data.map((question) => ({ ...question, options: shuffle(question.options) }))
+      );
       setError(null);
     } catch (err) {
       // Handle ApiError instances from the API client
@@ -124,17 +129,18 @@ export function useQuiz(questionCount: number = 15): UseQuizReturn {
   }, [loadQuestions]);
 
   // Select an answer for the current question
-  const selectAnswer = useCallback((answer: 'A' | 'B' | 'C' | 'D') => {
-    if (!questions[currentQuestionIndex]) return;
-
+  const selectAnswer = useCallback((optionIndex: number) => {
     const question = questions[currentQuestionIndex];
-    const isCorrect = answer === question.correct_answer;
+    const option = question?.options[optionIndex];
+    if (!option) return;
+
+    const isCorrect = option.is_correct;
 
     setUserAnswers((prev) => {
       const newAnswers = new Map(prev);
       newAnswers.set(question.id, {
         questionId: question.id,
-        selectedAnswer: answer,
+        selectedOptionIndex: optionIndex,
         isCorrect,
       });
       return newAnswers;
@@ -175,10 +181,9 @@ export function useQuiz(questionCount: number = 15): UseQuizReturn {
     return questions[currentQuestionIndex] || null;
   }, [questions, currentQuestionIndex]);
 
-  const selectedAnswer = useMemo(() => {
+  const selectedOptionIndex = useMemo(() => {
     if (!currentQuestion) return null;
-    const answer = userAnswers.get(currentQuestion.id);
-    return answer?.selectedAnswer || null;
+    return userAnswers.get(currentQuestion.id)?.selectedOptionIndex ?? null;
   }, [currentQuestion, userAnswers]);
 
   const score = useMemo(() => {
@@ -207,7 +212,7 @@ export function useQuiz(questionCount: number = 15): UseQuizReturn {
 
     // Computed values
     currentQuestion,
-    selectedAnswer,
+    selectedOptionIndex,
     score,
     totalQuestions,
     isFirstQuestion,
