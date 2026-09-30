@@ -1,15 +1,21 @@
-from openai import AsyncAzureOpenAI
 from pathlib import Path
+from textwrap import dedent
+
+from openai import AsyncAzureOpenAI
 from pydantic_ai import Agent
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.openai import OpenAIProvider
+
 from quizling.base.file_reader import FileReaderFactory
 from quizling.base.models import (
     MultipleChoiceQuestion,
     QuizConfig,
     QuizResult,
 )
-from textwrap import dedent
+
+
+class QuizGenerationError(Exception):
+    pass
 
 
 class QuizGenerator:
@@ -17,7 +23,7 @@ class QuizGenerator:
         100  # Minimum characters needed for meaningful question generation
     )
 
-    def __init__(self, config: QuizConfig):
+    def __init__(self, config: QuizConfig) -> None:
         self.config = config
         self._agent = self._create_agent()
 
@@ -60,7 +66,8 @@ class QuizGenerator:
 
             Requirements:
             - Generate exactly {self.config.num_questions} multiple choice questions
-            - Each question must have exactly 4 answer options, exactly one of them correct
+            - Each question must have exactly 4 answer options, exactly one of them
+              correct
             - Questions should be at {self.config.difficulty.value} difficulty level
             - Ensure questions test understanding, not just memorization
             - Make incorrect options plausible but clearly wrong
@@ -84,7 +91,8 @@ class QuizGenerator:
     def _build_agent_prompt(self, content: str) -> str:
         return dedent(f"""
             Based on the following content, generate {self.config.num_questions}
-            multiple choice questions at {self.config.difficulty.value} difficulty level.
+            multiple choice questions at {self.config.difficulty.value} difficulty
+            level.
 
             Content:
             {content}
@@ -95,13 +103,19 @@ class QuizGenerator:
     def _validate_content_length(self, content: str) -> None:
         stripped_content = content.strip()
         if len(stripped_content) < self.MIN_CONTENT_LENGTH:
-            raise ValueError(
-                f"Content is too short to generate questions. "
+            msg = (
+                "Content is too short to generate questions. "
                 f"Minimum {self.MIN_CONTENT_LENGTH} characters required, "
                 f"got {len(stripped_content)}"
             )
+            raise ValueError(msg)
 
     async def generate_from_file(self, file_path: str | Path) -> QuizResult:
+        """Generate questions from a .txt, .md, .pdf, or .docx file.
+
+        Raises FileNotFoundError or ValueError if the file can't be read, ValueError
+        if its content is too short, and QuizGenerationError if the model call fails.
+        """
         path = Path(file_path)
 
         content = FileReaderFactory.read_file(path)
@@ -116,6 +130,11 @@ class QuizGenerator:
         )
 
     async def generate_from_text(self, text: str) -> QuizResult:
+        """Generate questions from raw text.
+
+        Raises ValueError if the text is too short and QuizGenerationError if the
+        model call fails.
+        """
         self._validate_content_length(text)
 
         questions = await self._generate_questions(text)
@@ -131,6 +150,7 @@ class QuizGenerator:
 
         try:
             result = await self._agent.run(prompt)
-            return result.output
         except Exception as e:
-            raise Exception(f"Error generating questions: {str(e)}") from e
+            msg = f"Error generating questions: {e!s}"
+            raise QuizGenerationError(msg) from e
+        return result.output

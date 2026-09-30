@@ -1,8 +1,9 @@
 import json
-import pytest
 import tempfile
-
 from pathlib import Path
+
+import pytest
+
 from quizling.base.models import (
     AnswerOption,
     DifficultyLevel,
@@ -59,7 +60,10 @@ class TestQuizWriter:
                     AnswerOption(text="299,792 km/s", is_correct=False),
                     AnswerOption(text="186,282 mi/s", is_correct=False),
                 ],
-                explanation="The speed of light in vacuum is exactly 299,792,458 meters per second.",
+                explanation=(
+                    "The speed of light in vacuum is exactly 299,792,458 meters "
+                    "per second."
+                ),
                 difficulty=DifficultyLevel.HARD,
             ),
         ]
@@ -100,7 +104,7 @@ class TestQuizWriter:
             assert file_path.exists()
             assert file_path.suffix == ".json"
 
-            with open(file_path, encoding="utf-8") as f:
+            with file_path.open(encoding="utf-8") as f:
                 data = json.load(f)
                 assert isinstance(data, dict)
                 assert "question" in data
@@ -119,7 +123,7 @@ class TestQuizWriter:
 
         written_questions = []
         for file_path in written_files:
-            with open(file_path, encoding="utf-8") as f:
+            with file_path.open(encoding="utf-8") as f:
                 data = json.load(f)
                 written_questions.append(data)
 
@@ -207,7 +211,7 @@ class TestQuizWriter:
         writer = QuizWriter(quiz)
         written_files = writer.write()
 
-        with open(written_files[0], encoding="utf-8") as f:
+        with written_files[0].open(encoding="utf-8") as f:
             data = json.load(f)
             assert data["question"] == "¿Cuál es la capital de España?"
             assert "🇪🇸" in data["explanation"]
@@ -221,9 +225,9 @@ class TestQuizWriter:
 
         assert all(isinstance(f, Path) for f in written_files)
 
-    def test_init_with_none_quiz_result(self, temp_dir: Path) -> None:
+    def test_init_with_none_quiz_result(self) -> None:
         with pytest.raises(ValueError, match="quiz_result cannot be None"):
-            QuizWriter(None)  # type: ignore
+            QuizWriter(None)  # type: ignore[arg-type]
 
     def test_write_handles_directory_creation_failure(
         self, quiz_result: QuizResult
@@ -245,7 +249,7 @@ class TestQuizWriter:
         second_write = writer.write()
 
         all_files = first_write + second_write
-        unique_files = set(f.name for f in all_files)
+        unique_files = {f.name for f in all_files}
         assert len(unique_files) == len(all_files)
 
     def test_json_formatting(self, quiz_result: QuizResult, temp_dir: Path) -> None:
@@ -253,7 +257,7 @@ class TestQuizWriter:
         writer = QuizWriter(quiz_result)
         written_files = writer.write()
 
-        with open(written_files[0], encoding="utf-8") as f:
+        with written_files[0].open(encoding="utf-8") as f:
             content = f.read()
 
             assert "  " in content

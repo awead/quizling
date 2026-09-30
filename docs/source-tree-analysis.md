@@ -21,7 +21,7 @@ quizling/
 │   │   │   ├── router.py         #   GET /questions, GET /questions/{id}; DI via get_db()/get_question_service()
 │   │   │   ├── services.py       #   QuestionService, QuestionQueryParams, PaginationResult (business logic)
 │   │   │   ├── models.py         #   PaginatedResponse, QuestionResponse, ErrorResponse (response DTOs)
-│   │   │   ├── exceptions.py     #   QuizlingAPIException hierarchy (DatabaseError, ResourceNotFoundError, ...)
+│   │   │   ├── exceptions.py     #   QuizlingAPIError hierarchy (DatabaseError, ResourceNotFoundError, ...)
 │   │   │   └── error_handlers.py #   Maps exceptions → JSONResponse
 │   │   ├── base/                 # Question-generation domain (used by CLI, independent of API)
 │   │   │   ├── models.py         #   MultipleChoiceQuestion, AnswerOption, QuizConfig, QuizResult, DifficultyLevel

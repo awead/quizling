@@ -31,7 +31,7 @@ FastAPI backend consumed by a React single-page frontend for browsing questions 
 | LLM provider | Azure OpenAI | (`openai` SDK, `AsyncAzureOpenAI`) | Deployment name configurable, e.g. `gpt-5.5` |
 | Database | MongoDB | 7.0 (Docker image) | Accessed via `pymongo` |
 | Backend testing | pytest, pytest-asyncio, pytest-cov | | `make test`, `make test-cov` (in `backend/`) |
-| Backend lint/format | ruff | >=0.14 | |
+| Backend lint/format | ruff | >=0.14 | All rules enabled (`select = ["ALL"]`), exemptions in `pyproject.toml` |
 | Frontend language | TypeScript | ~5.9 | |
 | Frontend framework | React | ^19.1 | with `react-router-dom` ^7.9 |
 | Frontend build tool | Vite | ^7.1 | dev server proxies `/api` to backend on port 8000 |

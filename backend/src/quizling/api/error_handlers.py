@@ -1,20 +1,21 @@
 import logging
 
-from fastapi import Request, status
+from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from pymongo import errors as pymongo_errors
 
-from quizling.api.exceptions import QuizlingAPIException
+from quizling.api.exceptions import QuizlingAPIError
 from quizling.storage.db import MongoDBConnectionError
 
 logger = logging.getLogger(__name__)
 
 
-async def quizling_exception_handler(
-    request: Request, exc: QuizlingAPIException
+async def _quizling_error_handler(
+    _request: Request, exc: QuizlingAPIError
 ) -> JSONResponse:
     logger.warning(
-        f"QuizlingAPIException: {exc.message}",
+        "QuizlingAPIError: %s",
+        exc.message,
         extra={"status_code": exc.status_code, "details": exc.details},
     )
     return JSONResponse(
@@ -23,10 +24,10 @@ async def quizling_exception_handler(
     )
 
 
-async def mongodb_connection_error_handler(
-    request: Request, exc: MongoDBConnectionError
+async def _mongodb_connection_error_handler(
+    _request: Request, exc: MongoDBConnectionError
 ) -> JSONResponse:
-    logger.error(f"MongoDB connection error: {str(exc)}", exc_info=True)
+    logger.error("MongoDB connection error: %s", exc, exc_info=exc)
     return JSONResponse(
         status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
         content={
@@ -36,10 +37,10 @@ async def mongodb_connection_error_handler(
     )
 
 
-async def pymongo_error_handler(
-    request: Request, exc: pymongo_errors.PyMongoError
+async def _pymongo_error_handler(
+    _request: Request, exc: pymongo_errors.PyMongoError
 ) -> JSONResponse:
-    logger.error(f"PyMongo error: {str(exc)}", exc_info=True)
+    logger.error("PyMongo error: %s", exc, exc_info=exc)
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={
@@ -53,8 +54,8 @@ async def pymongo_error_handler(
     )
 
 
-async def generic_exception_handler(request: Request, exc: Exception) -> JSONResponse:
-    logger.exception(f"Unexpected error: {str(exc)}")
+async def _generic_exception_handler(_request: Request, exc: Exception) -> JSONResponse:
+    logger.error("Unexpected error: %s", exc, exc_info=exc)
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={
@@ -64,8 +65,9 @@ async def generic_exception_handler(request: Request, exc: Exception) -> JSONRes
     )
 
 
-def register_error_handlers(app) -> None:
-    app.add_exception_handler(QuizlingAPIException, quizling_exception_handler)
-    app.add_exception_handler(MongoDBConnectionError, mongodb_connection_error_handler)
-    app.add_exception_handler(pymongo_errors.PyMongoError, pymongo_error_handler)
-    app.add_exception_handler(Exception, generic_exception_handler)
+def register_error_handlers(app: FastAPI) -> None:
+    """Map Quizling, MongoDB, and unexpected exceptions to JSON error responses."""
+    app.add_exception_handler(QuizlingAPIError, _quizling_error_handler)
+    app.add_exception_handler(MongoDBConnectionError, _mongodb_connection_error_handler)
+    app.add_exception_handler(pymongo_errors.PyMongoError, _pymongo_error_handler)
+    app.add_exception_handler(Exception, _generic_exception_handler)

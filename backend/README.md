@@ -66,8 +66,8 @@ The loader does not skip duplicates, so loading the same files twice inserts the
 ### Supported File Formats
 
 - **Text files**: `.txt`, `.md`
-- **PDF files**: `.pdf` (requires `pypdf`)
-- **Word documents**: `.docx` (requires `python-docx`)
+- **PDF files**: `.pdf`
+- **Word documents**: `.docx`
 
 ### Examples
 

@@ -87,6 +87,12 @@ make lint     # uv run ruff check . && uv run ruff format --check .
 make format   # uv run ruff format .
 ```
 
+Ruff is configured in `backend/pyproject.toml` with every rule enabled (`select = ["ALL"]`, Google docstring
+convention). The only rules switched off are the ones that conflict with `ruff format` or with
+`docs/coding-standards.md` (no docstrings required on modules, classes, or tests), plus test-, example-, and
+CLI-specific exemptions such as `assert` in tests and `print` in the CLIs. Each exemption is commented in
+`pyproject.toml`.
+
 ## Frontend Setup
 
 ```bash
@@ -136,7 +142,7 @@ npm run lint     # eslint .
 
 ## CI
 
-- `.github/workflows/test-backend.yml`: matrix over Python 3.11/3.12, `uv sync` + `uv run pytest`, with
+- `.github/workflows/test-backend.yml`: matrix over Python 3.11/3.12, `uv sync`, `make lint` (`ruff check` + `ruff format --check`), `uv run pytest`, with
   placeholder Azure/Mongo env vars (no real external services are hit in backend tests).
-- `.github/workflows/test-frontend.yml`: matrix over Node 22/24, `npm ci`, `npm run build` (type-check),
+- `.github/workflows/test-frontend.yml`: matrix over Node 22/24, `npm ci`, `make lint` (`eslint`), `npm run build` (type-check),
   `npm run test:run`, `npm run test:coverage`, coverage uploaded as a build artifact.

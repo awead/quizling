@@ -55,8 +55,8 @@ runs — check before assuming more is enforced than really is:
 
 | Area | Lint / type-check | Tests | Enforced in CI? |
 |---|---|---|---|
-| `backend/` | `uv run ruff check .`, `uv run ruff format --check .` | `uv run pytest tests/ -v` | Only `uv run pytest` runs in [test-backend.yml](.github/workflows/test-backend.yml) — `ruff` is not currently a CI step, run it yourself |
-| `frontend/` | `npm run build` (type-check via `tsc -b`), `npm run lint` | `npm run test:run`, `npm run test:coverage` | [test-frontend.yml](.github/workflows/test-frontend.yml) runs `build`, `test:run`, and `test:coverage` — `npm run lint` is **not** a CI step, run it yourself |
+| `backend/` | `uv run ruff check .`, `uv run ruff format --check .` | `uv run pytest tests/ -v` | Yes — [test-backend.yml](.github/workflows/test-backend.yml) runs `make lint` (both `ruff` commands) and `uv run pytest` |
+| `frontend/` | `npm run build` (type-check via `tsc -b`), `npm run lint` | `npm run test:run`, `npm run test:coverage` | Yes — [test-frontend.yml](.github/workflows/test-frontend.yml) runs `make lint`, `build`, `test:run`, and `test:coverage` |
 
 - `make lint` and `make test` in `backend/` or `frontend/` run the commands above (plus `make build`
   in `frontend/`).

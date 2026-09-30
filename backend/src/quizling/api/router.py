@@ -1,3 +1,4 @@
+from collections.abc import Iterator
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
@@ -9,7 +10,8 @@ from quizling.storage.db import MongoDBClient
 router = APIRouter(prefix="/questions", tags=["questions"])
 
 
-def get_db() -> MongoDBClient:
+def get_db() -> Iterator[MongoDBClient]:
+    """Yield a MongoDB client for one request and close it afterwards."""
     db = MongoDBClient()
     try:
         yield db
@@ -20,15 +22,18 @@ def get_db() -> MongoDBClient:
 def get_question_service(
     db: Annotated[MongoDBClient, Depends(get_db)],
 ) -> QuestionService:
+    """Build the question service for one request."""
     return QuestionService(db)
 
 
 @router.get(
     "",
-    response_model=PaginatedResponse,
     responses={500: {"model": ErrorResponse}},
     summary="Get all questions",
-    description="Retrieve questions with optional filtering by difficulty or search text. Supports cursor-based pagination.",
+    description=(
+        "Retrieve questions with optional filtering by difficulty or search text. "
+        "Supports cursor-based pagination."
+    ),
 )
 async def get_questions(
     service: Annotated[QuestionService, Depends(get_question_service)],
@@ -43,8 +48,7 @@ async def get_questions(
         int, Query(description="Number of results per page", ge=1, le=100)
     ] = 20,
 ) -> PaginatedResponse:
-    """
-    Get all questions with optional filtering and pagination.
+    """Get all questions with optional filtering and pagination.
 
     - **difficulty**: Filter by difficulty level
     - **search**: Search for text in questions
@@ -69,7 +73,6 @@ async def get_questions(
 
 @router.get(
     "/{question_id}",
-    response_model=QuestionResponse,
     responses={404: {"model": ErrorResponse}, 500: {"model": ErrorResponse}},
     summary="Get a specific question",
     description="Retrieve a single question by its ID.",
@@ -78,8 +81,7 @@ async def get_question(
     question_id: str,
     service: Annotated[QuestionService, Depends(get_question_service)],
 ) -> QuestionResponse:
-    """
-    Get a specific question by ID.
+    """Get a specific question by ID.
 
     - **question_id**: MongoDB ObjectId of the question
     """

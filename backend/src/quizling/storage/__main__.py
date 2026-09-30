@@ -1,15 +1,18 @@
 """Script to load quiz questions from JSON files into MongoDB."""
 
 import argparse
+import logging
 import sys
 from pathlib import Path
+
+from pymongo.errors import PyMongoError
 
 from quizling.storage import MongoDBClient
 from quizling.storage.db import MongoDBConnectionError
 from quizling.storage.loader import load_questions_from_directory
 
 
-def main() -> None:
+def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Load quiz questions from JSON files into MongoDB"
     )
@@ -53,7 +56,13 @@ def main() -> None:
         help="Create database indexes for better performance",
     )
 
-    args = parser.parse_args()
+    return parser.parse_args()
+
+
+def main() -> None:
+    """Load question JSON files from a directory into MongoDB."""
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
+    args = _parse_args()
 
     directory = Path(args.directory)
     if not directory.exists():
@@ -105,8 +114,8 @@ def main() -> None:
         print(f"\nError: {e}", file=sys.stderr)
         print("\nMake sure MongoDB is running (try: docker-compose up -d)")
         sys.exit(1)
-    except Exception as e:
-        print(f"\nUnexpected error: {e}", file=sys.stderr)
+    except PyMongoError as e:
+        print(f"\nDatabase error: {e}", file=sys.stderr)
         sys.exit(1)
 
     print("\n✓ Questions loaded successfully!")

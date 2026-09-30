@@ -92,7 +92,7 @@ Retrieve a single question by its MongoDB ObjectId.
 
 ## Error Model
 
-All custom exceptions extend `QuizlingAPIException` (`api/exceptions.py`) and are converted to
+All custom exceptions extend `QuizlingAPIError` (`api/exceptions.py`) and are converted to
 `{"detail": message, ...details}` JSON responses by handlers in `api/error_handlers.py`:
 
 | Exception | HTTP Status | Notes |
@@ -101,7 +101,7 @@ All custom exceptions extend `QuizlingAPIException` (`api/exceptions.py`) and ar
 | `ResourceNotFoundError` | 404 | Includes `resource_type`, `resource_id` |
 | `InvalidObjectIdError` | 400 | Includes `provided_id` |
 | `ValidationError` | 422 | Defined but not currently raised by any route |
-| `MongoDBConnectionError` (not a `QuizlingAPIException`) | 503 | Raised when `MongoDBClient` can't connect; handled separately |
+| `MongoDBConnectionError` (not a `QuizlingAPIError`) | 503 | Raised when `MongoDBClient` can't connect; handled separately |
 | Generic `pymongo.errors.PyMongoError` | 500 | Caught by a dedicated handler |
 | Any other unhandled `Exception` | 500 | Generic fallback handler, logged via `logger.exception` |
 

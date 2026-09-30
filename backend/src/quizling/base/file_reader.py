@@ -1,5 +1,8 @@
 from pathlib import Path
-from typing import Protocol
+from typing import ClassVar, Protocol
+
+from docx import Document
+from pypdf import PdfReader
 
 
 class FileReader(Protocol):
@@ -23,13 +26,12 @@ class TextFileReader:
         Raises:
             FileNotFoundError: If the file does not exist
             IOError: If there is an error reading the file
+
         """
         try:
-            with open(file_path, "r", encoding="utf-8") as f:
-                return f.read()
+            return file_path.read_text(encoding="utf-8")
         except UnicodeDecodeError:
-            with open(file_path, "r", encoding="latin-1") as f:
-                return f.read()
+            return file_path.read_text(encoding="latin-1")
 
 
 class PDFFileReader:
@@ -44,25 +46,12 @@ class PDFFileReader:
 
         Raises:
             FileNotFoundError: If the file does not exist
-            ImportError: If pypdf is not installed
             IOError: If there is an error reading the file
+
         """
-        try:
-            from pypdf import PdfReader
-        except ImportError as e:
-            raise ImportError(
-                "pypdf is required to read PDF files. Install it with: pip install pypdf"
-            ) from e
-
         reader = PdfReader(file_path)
-        text_parts = []
-
-        for page in reader.pages:
-            text = page.extract_text()
-            if text:
-                text_parts.append(text)
-
-        return "\n\n".join(text_parts)
+        page_texts = (page.extract_text() for page in reader.pages)
+        return "\n\n".join(text for text in page_texts if text)
 
 
 class DOCXFileReader:
@@ -77,31 +66,17 @@ class DOCXFileReader:
 
         Raises:
             FileNotFoundError: If the file does not exist
-            ImportError: If python-docx is not installed
             IOError: If there is an error reading the file
+
         """
-        try:
-            from docx import Document
-        except ImportError as e:
-            raise ImportError(
-                "python-docx is required to read DOCX files. "
-                "Install it with: pip install python-docx"
-            ) from e
-
         doc = Document(file_path)
-        text_parts = []
-
-        for paragraph in doc.paragraphs:
-            if paragraph.text.strip():
-                text_parts.append(paragraph.text)
-
-        return "\n\n".join(text_parts)
+        return "\n\n".join(p.text for p in doc.paragraphs if p.text.strip())
 
 
 class FileReaderFactory:
     """Factory for creating appropriate file readers based on file extension."""
 
-    READERS: dict[str, type[FileReader]] = {
+    READERS: ClassVar[dict[str, type[FileReader]]] = {
         ".txt": TextFileReader,
         ".md": TextFileReader,
         ".pdf": PDFFileReader,
@@ -120,15 +95,15 @@ class FileReaderFactory:
 
         Raises:
             ValueError: If the file extension is not supported
+
         """
         extension = file_path.suffix.lower()
 
         reader_class = cls.READERS.get(extension)
         if reader_class is None:
             supported = ", ".join(cls.READERS.keys())
-            raise ValueError(
-                f"Unsupported file type: {extension}. Supported types: {supported}"
-            )
+            msg = f"Unsupported file type: {extension}. Supported types: {supported}"
+            raise ValueError(msg)
 
         return reader_class()
 
@@ -146,14 +121,17 @@ class FileReaderFactory:
             FileNotFoundError: If the file does not exist
             ValueError: If the file type is not supported
             IOError: If there is an error reading the file
+
         """
         path = Path(file_path)
 
         if not path.exists():
-            raise FileNotFoundError(f"File not found: {path}")
+            msg = f"File not found: {path}"
+            raise FileNotFoundError(msg)
 
         if not path.is_file():
-            raise ValueError(f"Path is not a file: {path}")
+            msg = f"Path is not a file: {path}"
+            raise ValueError(msg)
 
         reader = cls.get_reader(path)
         return reader.read(path)

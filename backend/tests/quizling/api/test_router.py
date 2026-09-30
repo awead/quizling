@@ -1,6 +1,9 @@
-import pytest
-from fastapi.testclient import TestClient
+from collections.abc import Iterator
 from unittest.mock import MagicMock, patch
+
+import pytest
+from bson.errors import InvalidId
+from fastapi.testclient import TestClient
 
 from quizling.api.app import app
 from quizling.base.models import (
@@ -55,7 +58,7 @@ def client() -> TestClient:
 
 
 @pytest.fixture
-def mock_db():
+def mock_db() -> Iterator[MagicMock]:
     with patch("quizling.api.router.MongoDBClient") as mock:
         db_instance = MagicMock()
         mock.return_value = db_instance
@@ -163,7 +166,8 @@ class TestGetQuestions:
         # Should only return easy questions
         assert all(q["difficulty"] == "easy" for q in data["data"])
 
-    def test_pagination_limits(self, client: TestClient, mock_db: MagicMock) -> None:
+    @pytest.mark.usefixtures("mock_db")
+    def test_pagination_limits(self, client: TestClient) -> None:
         # Test limit too high
         response = client.get("/questions?limit=101")
         assert response.status_code == 422  # Validation error
@@ -231,7 +235,16 @@ class TestGetQuestionById:
     def test_get_question_invalid_id(
         self, client: TestClient, mock_db: MagicMock
     ) -> None:
-        mock_db.get_question.side_effect = Exception("Invalid ObjectId")
+        mock_db.get_question.side_effect = InvalidId("not a valid ObjectId")
+
+        response = client.get("/questions/invalid-id")
+        assert response.status_code == 400
+        assert response.json()["provided_id"] == "invalid-id"
+
+    def test_get_question_database_error(
+        self, client: TestClient, mock_db: MagicMock
+    ) -> None:
+        mock_db.get_question.side_effect = Exception("connection reset")
 
         response = client.get("/questions/invalid-id")
         assert response.status_code == 500

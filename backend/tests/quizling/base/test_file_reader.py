@@ -1,8 +1,8 @@
-import pytest
 import tempfile
-
-
 from pathlib import Path
+
+import pytest
+
 from quizling.base.file_reader import (
     DOCXFileReader,
     FileReaderFactory,
@@ -85,6 +85,8 @@ class TestFileReaderFactory:
             FileReaderFactory.read_file("/nonexistent/file.txt")
 
     def test_read_file_is_directory(self) -> None:
-        with tempfile.TemporaryDirectory() as temp_dir:
-            with pytest.raises(ValueError, match="not a file"):
-                FileReaderFactory.read_file(temp_dir)
+        with (
+            tempfile.TemporaryDirectory() as temp_dir,
+            pytest.raises(ValueError, match="not a file"),
+        ):
+            FileReaderFactory.read_file(temp_dir)

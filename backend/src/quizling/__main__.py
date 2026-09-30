@@ -6,12 +6,16 @@ import sys
 from pathlib import Path
 
 from quizling.base import DifficultyLevel, QuizConfig, QuizGenerator
-from quizling.base.quiz_writer import QuizWriter
+from quizling.base.generator import QuizGenerationError
+from quizling.base.quiz_writer import QuizWriter, QuizWriterError
 
 
 def parse_args() -> argparse.Namespace:
+    """Parse the question generator's command-line arguments."""
     parser = argparse.ArgumentParser(
-        description="Generate multiple choice questions from documents using Azure OpenAI"
+        description=(
+            "Generate multiple choice questions from documents using Azure OpenAI"
+        )
     )
 
     parser.add_argument("file", type=str, help="Path to the document file to process")
@@ -66,6 +70,7 @@ def parse_args() -> argparse.Namespace:
 
 
 async def main() -> None:
+    """Generate questions from a document and write each to a JSON file."""
     args = parse_args()
 
     file_path = Path(args.file)
@@ -103,7 +108,7 @@ async def main() -> None:
         for file_path in written_files:
             print(f"  - {file_path}")
 
-    except Exception as e:
+    except (OSError, ValueError, QuizGenerationError, QuizWriterError) as e:
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
 

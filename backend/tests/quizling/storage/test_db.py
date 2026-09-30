@@ -1,5 +1,8 @@
-import pytest
 from unittest.mock import MagicMock, patch
+
+import pytest
+from bson.errors import InvalidId
+from pymongo import errors
 
 from quizling.base.models import AnswerOption, DifficultyLevel, MultipleChoiceQuestion
 from quizling.storage import MongoDBClient
@@ -88,8 +91,6 @@ class TestMongoDBClient:
 
     def test_connection_error(self) -> None:
         with patch("quizling.storage.db.MongoClient") as mock_client_class:
-            from pymongo import errors
-
             mock_client_class.return_value.server_info.side_effect = (
                 errors.ServerSelectionTimeoutError("Connection failed")
             )
@@ -161,7 +162,7 @@ class TestMongoDBClient:
     def test_get_question(self, sample_question: MultipleChoiceQuestion) -> None:
         with (
             patch("quizling.storage.db.MongoClient") as mock_client_class,
-            patch("bson.ObjectId") as mock_objectid,
+            patch("quizling.storage.db.ObjectId") as mock_objectid,
         ):
             mock_client = MagicMock()
             mock_collection = MagicMock()
@@ -199,9 +200,22 @@ class TestMongoDBClient:
             mock_collection.find_one.return_value = None
 
             client = MongoDBClient()
-            result = client.get_question("nonexistent_id")
+            result = client.get_question("507f1f77bcf86cd799439011")
 
             assert result is None
+
+    def test_get_question_invalid_id(self) -> None:
+        with patch("quizling.storage.db.MongoClient"):
+            client = MongoDBClient()
+
+            with pytest.raises(InvalidId):
+                client.get_question("not-an-object-id")
+
+    def test_delete_question_invalid_id(self) -> None:
+        with patch("quizling.storage.db.MongoClient"):
+            client = MongoDBClient()
+
+            assert client.delete_question("not-an-object-id") is False
 
     def test_get_questions_by_difficulty(
         self, sample_questions: list[MultipleChoiceQuestion]
@@ -249,7 +263,7 @@ class TestMongoDBClient:
     def test_delete_question(self) -> None:
         with (
             patch("quizling.storage.db.MongoClient") as mock_client_class,
-            patch("bson.ObjectId") as mock_objectid,
+            patch("quizling.storage.db.ObjectId") as mock_objectid,
         ):
             mock_client = MagicMock()
             mock_collection = MagicMock()

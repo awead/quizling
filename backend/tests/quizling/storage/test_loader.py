@@ -28,7 +28,7 @@ def sample_question() -> MultipleChoiceQuestion:
 @pytest.fixture
 def temp_json_file(tmp_path: Path, sample_question: MultipleChoiceQuestion) -> Path:
     json_file = tmp_path / "question.json"
-    with open(json_file, "w", encoding="utf-8") as f:
+    with json_file.open("w", encoding="utf-8") as f:
         json.dump(sample_question.model_dump(), f)
     return json_file
 
@@ -62,7 +62,7 @@ def temp_directory_with_questions(tmp_path: Path) -> Path:
 
     for i, q in enumerate(questions):
         json_file = tmp_path / f"question_{i}.json"
-        with open(json_file, "w", encoding="utf-8") as f:
+        with json_file.open("w", encoding="utf-8") as f:
             json.dump(q.model_dump(), f)
 
     return tmp_path
@@ -87,7 +87,7 @@ class TestLoadQuestionFromFile:
 
     def test_load_invalid_json(self, tmp_path: Path) -> None:
         invalid_file = tmp_path / "invalid.json"
-        with open(invalid_file, "w", encoding="utf-8") as f:
+        with invalid_file.open("w", encoding="utf-8") as f:
             f.write("{ invalid json }")
 
         result = load_question_from_file(invalid_file)
@@ -96,7 +96,7 @@ class TestLoadQuestionFromFile:
 
     def test_load_invalid_question_data(self, tmp_path: Path) -> None:
         invalid_file = tmp_path / "invalid_question.json"
-        with open(invalid_file, "w", encoding="utf-8") as f:
+        with invalid_file.open("w", encoding="utf-8") as f:
             json.dump({"question": "test"}, f)  # Missing required fields
 
         result = load_question_from_file(invalid_file)
@@ -126,7 +126,7 @@ class TestLoadQuestionsFromDirectory:
         )
 
         json_file = tmp_path / "question.json"
-        with open(json_file, "w", encoding="utf-8") as f:
+        with json_file.open("w", encoding="utf-8") as f:
             json.dump(question.model_dump(), f)
 
         txt_file = tmp_path / "other.txt"
@@ -157,11 +157,11 @@ class TestLoadQuestionsFromDirectory:
         )
 
         valid_file = tmp_path / "valid.json"
-        with open(valid_file, "w", encoding="utf-8") as f:
+        with valid_file.open("w", encoding="utf-8") as f:
             json.dump(valid_question.model_dump(), f)
 
         invalid_file = tmp_path / "invalid.json"
-        with open(invalid_file, "w", encoding="utf-8") as f:
+        with invalid_file.open("w", encoding="utf-8") as f:
             f.write("{ invalid }")
 
         questions = load_questions_from_directory(tmp_path)

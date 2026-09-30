@@ -1,7 +1,6 @@
 import asyncio
-
-
 from pathlib import Path
+
 from quizling.base import DifficultyLevel, QuizConfig, QuizGenerator
 
 
@@ -40,8 +39,7 @@ async def main() -> None:
         of code. The Python Package Index (PyPI) hosts over 400,000 third-party
         packages that extend Python's functionality for various use cases.
         """
-        with open(file_path, "w") as f:
-            f.write(sample_content)
+        Path(file_path).write_text(sample_content)
 
     print(f"Generating quiz from {file_path}...")
     result = await generator.generate_from_file(file_path)

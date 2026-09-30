@@ -1,8 +1,8 @@
 import os
+
 import pytest
-
-
 from pydantic import ValidationError
+
 from quizling.base.models import (
     AnswerOption,
     DifficultyLevel,
