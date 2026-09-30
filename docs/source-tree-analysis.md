@@ -13,7 +13,7 @@ quizling/
 ├── backend/                      # Python package "quizling" (uv-managed)
 │   ├── pyproject.toml            # Deps: pydantic-ai, fastapi, pymongo, pypdf, python-docx, ruff, pytest
 │   ├── Dockerfile                # python:3.12-slim + uv, runs uvicorn
-│   ├── Makefile                  # make test / test-cov / console / api
+│   ├── Makefile                  # make install / test / test-cov / lint / format / console / api
 │   ├── src/quizling/
 │   │   ├── __main__.py           # Entry point: CLI question generator (python -m quizling <file>)
 │   │   ├── api/                  # FastAPI HTTP layer → Calls storage/ for persistence
@@ -37,6 +37,7 @@ quizling/
 │
 └── frontend/                     # React 19 + TypeScript + Vite SPA
     ├── package.json              # react-router-dom, axios, tailwindcss v4, vitest, msw, testing-library
+    ├── Makefile                  # make install / test / test-cov / lint / format / build / dev (wraps npm scripts)
     ├── vite.config.ts            # "@/" alias → src/, dev server proxies /api → http://localhost:8000
     ├── Dockerfile                # Multi-stage: node:20-alpine build → nginx:alpine serve
     ├── nginx.conf                # Reverse-proxies /api/ → backend:8000, SPA fallback to index.html

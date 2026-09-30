@@ -58,6 +58,8 @@ runs — check before assuming more is enforced than really is:
 | `backend/` | `uv run ruff check .`, `uv run ruff format --check .` | `uv run pytest tests/ -v` | Only `uv run pytest` runs in [test-backend.yml](.github/workflows/test-backend.yml) — `ruff` is not currently a CI step, run it yourself |
 | `frontend/` | `npm run build` (type-check via `tsc -b`), `npm run lint` | `npm run test:run`, `npm run test:coverage` | [test-frontend.yml](.github/workflows/test-frontend.yml) runs `build`, `test:run`, and `test:coverage` — `npm run lint` is **not** a CI step, run it yourself |
 
+- `make lint` and `make test` in `backend/` or `frontend/` run the commands above (plus `make build`
+  in `frontend/`).
 - No coverage floor is configured or enforced anywhere (no `--cov-fail-under`, no vitest coverage
   thresholds) — coverage is reported, not gated. Don't claim a coverage bar was met; there isn't
   one.
@@ -101,8 +103,9 @@ These are generated but tracked — they belong in your diff, but only via the t
 
 ## Secrets
 
-- Environment variable names/defaults are defined in root `mise.toml` (`[env]`), including
-  `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_KEY`, `AZURE_OPENAI_VERSION`,
-  `AZURE_OPENAI_DEPLOYMENT`, `MONGODB_URI`, and `MONGO_DATABASE`.
+- Non-secret environment variables are defined in root `mise.toml` (`[env]`), including
+  `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_VERSION`, `AZURE_OPENAI_DEPLOYMENT`, and
+  `MONGO_DATABASE`. Secrets (`AZURE_OPENAI_KEY`, `MONGODB_URI`, `MONGO_ROOT_PASSWORD`) are in
+  `fnox.toml`.
 - Never commit real credentials; no secrets belong in the frontend build since it ships to the
   browser.
